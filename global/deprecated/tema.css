@@ -1,0 +1,134 @@
+/* tema */
+:root {
+	--padding: 11px;
+	--radius: 3px;
+}
+
+
+.none{
+	display: none !important;
+}
+
+.flex{
+	display: flex;
+}
+
+body {
+	/* background-image: linear-gradient(45deg, #ecb3b3, #dfd129e6); */
+}
+
+.table th,.table td {
+	border: 1px solid;
+	text-align: center;
+	padding: 5px;
+}
+
+.table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.table th {
+	background-color: green;
+	color: white;
+}
+
+.table tr:nth-child(even) {
+    background-color: #ceceff;
+}
+.table tr:hover {
+	background: hsl(0 0% 70% / 1);
+}
+
+
+[type=file] {
+    border: 1px solid gray;
+    color: gray;
+}
+
+
+/* khusus, avoid */
+button {
+	background-color: red;
+	color: white;
+}
+
+button::after {
+	content: " (remove me) ";
+	border: none;
+}
+
+/* remove default browser*/
+
+/* mobile first*/
+.popup select,.popup 
+[type] {
+	width: 100%;
+}
+
+/* tak tertata*/
+
+
+.table a {
+	background-color: blue;
+	color: white;
+	display: inline-block;
+	padding: 6px;
+	text-decoration: none;
+	border-radius: 5px;
+}
+
+
+.notif {
+    display: inline-block;
+    border-radius: 50%;
+    background-color: orange;
+    width: 26px;
+    aspect-ratio: 1/1;
+    align-content: center;
+    font-size: 12px;
+}
+
+.thtombol{
+	width: 111px;
+}
+
+.breadcumb>div+div:before {
+	content: " / ";
+}
+
+.breadcumb>div {
+    display: inline;
+}
+/* responsive, desktop first */
+
+@media screen and (max-width: 768px) {
+	/**** jika berjalan di mobile ****/
+	.nilai{
+		flex-direction: column;
+	}
+	.popup .tombol{
+		width:unset;
+		align-self:unset;
+	}
+	.popup form{
+		width: 100%;
+	}
+}
+
+
+/* baruuuu */
+input[type="button"],[type=submit] ,::file-selector-button{
+    background-color: hsl(216 70% 58% / 1);
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 4px;
+}
+
+td{
+	color: hsl(0 0% 28% / 1);
+}
+::file-selector-button {
+    transform: scale(.9);
+}

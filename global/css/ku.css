@@ -1,0 +1,337 @@
+/* 
+by me
+info : framework css ku
+start : 14 oktober 2025
+last : x
+*/
+
+
+/* modal */
+
+.modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: rgb(0 0 0 / 50%);
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.modal .box{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+  /* ok */
+*{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-sizing: border-box;
+}
+body{
+    padding: 0;
+    margin: 0;
+}
+.padding{
+    padding: 11px;
+}
+.panel{
+    margin-top: 11px;
+    margin-bottom: 11px;
+}
+
+/* flex */
+.flex{
+    display: flex;
+}
+.gap{
+    gap: 11px;
+}
+
+.flexcolumn{
+    flex-direction: column;
+}
+
+.button {
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.button:hover{
+    background-color:#9e9e9e;
+}
+
+.table{
+    border: 1px solid;
+    border-collapse: collapse;
+}
+.table th {
+    background-color: rgb(179 255 179);
+    color: dimgray;
+    text-align: left;
+}
+.table tr:nth-child(even){
+    background-color:#e8e8e8;
+}
+
+.table tr:hover{
+    background-color: #ccc;
+}
+.table tr{
+    border-bottom: 1px solid black;
+}
+.table td,.table th{
+    padding: 11px;
+    white-space: nowrap;
+}
+
+.fontsize2{
+    font-size: 1.2em;
+}
+.fontsize3{
+    font-size: 1.4em;
+}
+.fontsize4{
+    font-size: 1.6em;
+}
+.fontsize5{
+    font-size: 1.8em;
+}
+.fontsize6{
+    font-size: 2.em;
+}
+
+.none{
+    display: none!important;
+}
+.border{
+    border: 1px solid black;
+}
+.center{
+    text-align: center;
+}
+.circle{
+    border-radius: 50%;
+}
+
+/* warna */
+.bgred{
+    background-color: red;
+}
+.bgorange{
+    background-color: orange;
+}
+.bgyellow{
+    background-color: yellow;
+}
+.bggreen{
+    background-color: green;
+}
+.bgblue{
+    background-color: blue;
+}
+.bgindigo{
+    background-color: indigo;
+}
+.bgpurple{
+    background-color: purple;
+}
+.bgblack{
+    background-color: black;
+}
+.bgpink{
+    background-color: pink;
+}
+.card{
+    box-shadow: 0 4px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+}
+.bold{
+    font-weight: bold;
+}
+.lowercase{
+    text-transform: lowercase;
+}
+.borderradius{
+    border-radius: 5px;
+}
+.transition{
+    transition: all .3s;
+}
+
+.flexgrow{
+    flex-grow: 1;
+}
+.widthfull{
+    width: 100%;
+}
+.marginauto,.centermargin{
+    margin: auto;
+}
+
+/* hover */
+.hoverbgred:hover{
+    background-color: red;
+}
+
+
+/* alert */
+  .alert {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background-color:rgba(0,0,0,0.5);
+
+  }
+
+.alert .box {
+    position: absolute;
+    background-color: white;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 6px 6px 6px black;
+}
+
+.alert   .judul{
+    background-color: #e7e7e7;
+    text-align: right;
+    border-bottom: inherit;
+  }
+.alert  .isi {
+    min-height: 233px;
+    min-width: 444px;
+    padding: 11px;
+    font-size: 33px;
+    display: grid;
+    place-content: center;
+}
+.alert  .close {
+    background-color: blue;
+    color: white;
+    display: inline-block;
+    width: 55px;
+    margin: 5px;
+    aspect-ratio: 1/1;
+    text-align: center;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 39px;
+}
+.alert .close:hover{
+    background-color: gray;
+}
+/* confirm */
+.confirm {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color:rgba(0,0,0,0.5);
+    left: 0;
+    top: 0;
+}
+.confirm .box {
+    position: absolute;
+    background-color: white;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 6px 6px 6px 0px;
+    border: 1px solid;
+    border-radius: 5px;
+}
+.confirm .judul {
+    text-align: right;
+    padding: 5px;
+    border-bottom: inherit;
+    display: none;
+}
+.confirm .isi {
+    padding: 11px;
+    width: 555px;
+    height: 190px;
+    font-size: 33px;
+    text-align: center;
+    display: grid;
+    place-content: center;
+}.confirm .footer {
+    padding: 11px;
+    text-align: right;
+    border-top: 1.5px solid lightgray;
+}
+.confirm .close {
+    background-color: blue;
+    display: inline-block;
+    color: white;
+    width: 22px;
+    aspect-ratio: 1/1;
+    /* display: grid; */
+    place-items: center;
+    text-align: center;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.confirm .ya, .confirm .tidak {
+    background-color: blue;
+    border: none;
+    color: white;
+    padding: 15px 28px;
+    font-size: 18px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.confirm .ya:hover,.confirm .tidak:hover{
+    background-color: gray;
+}
+
+.badge {
+    border-radius: 50%;
+    color: white;
+    background-color: red;
+    width: 22px;
+    aspect-ratio: 1/1;
+    display: inline-grid;
+    place-content: center;
+    font-size: 12px;
+}
+/* tabs */
+
+  .tab {
+    border: 1px solid #ccc;
+  }
+
+  .tab .judul {
+    display: flex;
+    border-bottom: inherit;
+    background-color: #f2f2f2;
+    cursor: pointer;
+  }
+  .tab .judul .item:hover{
+    color: black;
+    background-color: lightgray!important;
+  }
+
+ 
+  .tab .aktif {
+    background-color: #8c8c8c !important;
+    color: white;
+  }
+
+  .tab .judul .item {
+    padding: 11px;
+  }
+
+  .tab .isi .item {
+    padding: 11px;
+    min-height: 111px;
+  }

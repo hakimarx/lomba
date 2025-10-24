@@ -1,0 +1,27 @@
+/* css untuk isian didalam popup crud */
+.isian {
+    background-color: white;
+    width: 555px;
+    max-height: 444px;
+    display: flex;
+    flex-direction: column;
+}
+.isian .isi {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+.isian .footer {
+    background-color: #e7e7e7;
+    text-align:right;
+    border-top: 1px solid darkgray;
+}
+
+.isian .isi input,.isian .isi select{
+    margin-bottom:11px;
+    padding: 11px;
+}
+
+.isian .isi,.isian .footer{
+    padding: 11px;
+}

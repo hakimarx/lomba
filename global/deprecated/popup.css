@@ -1,0 +1,53 @@
+.popup {
+	/*
+		.popup .box .form. (.isi .tombol)
+	*/
+	background-color: rgba(1, 1, 1, .88);
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	/* display: flex; */
+	display: none;
+	justify-content: center;
+	align-items: center;
+	padding: 11px;
+}
+
+.popup .box {
+	background-color: white;
+    border: 1px solid;
+	border-radius: 5px;
+}
+
+.popup .tombol {
+	display: flex;
+	gap: 11px;
+	margin-top: 11px;
+	width:444px;
+	align-self: flex-end;
+
+}
+.popup .isi{
+	overflow: auto;
+}
+
+.popup form {
+    display: flex;
+    flex-direction: column;
+	padding: 11px;
+	max-height: 100%;
+	width: 666px;
+}
+
+@media screen and (max-width: 768px) {
+	/**** jika berjalan di mobile ****/
+	.popup .tombol{
+		width:unset;
+		align-self:unset;
+	}
+	.popup form{
+		width: 100%;
+	}
+}
