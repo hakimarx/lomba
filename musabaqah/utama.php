@@ -1,5 +1,6 @@
 <?php
 	function getmenu(){
+		global $role;
 		$ideventaktif=getonedata("select id from event where aktif=1");
 		?>
 		<a href='?page=utama&page2=acaknomor'>acak nomor peserta</a>
@@ -27,6 +28,23 @@
 			<a href='?page=utama&page2=user'>user</a>
 			<a href='?page=utama&page2=user_level'>user level</a>
 
+			<!-- adminprov manages admin kab/ko -->
+			<?php if($role=='adminprov'){ ?>
+				<a href='?page=utama&page2=admin_kabko'>manage admin kab/ko</a>
+			<?php } ?>
+			<!-- Hafidz menu for admin pages -->
+			<a href='?page=utama&page2=hafidz'>hafidz</a>
+			<?php if($role=='adminprov' || $role=='adminkabko'){ ?>
+					<a href='?page=utama&page2=hafidz_dashboard'>hafidz dashboard</a>
+					<a href='?page=utama&page2=hafidz_nilai'>penilaian hafidz</a>
+                    <a href='?page=utama&page2=hafidz_reports'>hafidz laporan</a>
+                    <a href='?page=utama&page2=hafidz_saran'>hafidz saran</a>
+                    <a href='?page=utama&page2=hafidz_rekening'>hafidz rekening</a>
+			<?php } ?>
+			<?php if($role=='adminprov'){ ?>
+					<a href='?page=utama&page2=hafidz_transfer'>hafidz transfer</a>
+			<?php } ?>
+
 			<a href='?logout'>logout</a>
 
 			<a href='?page=utama&page2=allthetime'>all the time</a>
@@ -43,7 +61,12 @@
 		header("Location:?page=utama&page2=home");
 	}
 
-	$role=getonedata("select role from view_user where iduser=".getiduser());
+	$iduser = getiduser();
+	if($iduser){
+		$role=getonedata("select role from view_user where iduser=".$iduser);
+	}else{
+		$role='';
+	}
 ?>
 
 
@@ -87,7 +110,7 @@
 
 	.nav a:hover {
 		background-color: red;
-		//border-bottom: 5px solid green;
+		/* border-bottom: 5px solid green; */
 	}
 
 	.utama {
@@ -182,8 +205,12 @@
 		<div class="welcomeuser">
 			<?php
 						$iduser=getiduser();
-						$rowvu=getonebaris("select * from view_user where iduser=$iduser");
-						echo "selamat datang user : $rowvu[nama] ($rowvu[level]/$rowvu[role])";
+						if($iduser){
+							$rowvu=getonebaris("select * from view_user where iduser=$iduser");
+							echo "selamat datang user : $rowvu[nama] ($rowvu[level]/$rowvu[role])";
+						}else{
+							echo "selamat datang";
+						}
 				?>
 		</div>
 	</div>

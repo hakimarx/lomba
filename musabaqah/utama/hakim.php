@@ -1,7 +1,7 @@
 <?php
 
     function ekse($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){

@@ -1,7 +1,7 @@
 <?php
-    include "../../global/class/fungsi.php";
-    include "../dbku.php";
-    include "sesi.php";
+    include __DIR__ . "/../../global/class/fungsi.php";
+    include __DIR__ . "/../dbku.php";
+    include __DIR__ . "/sesi.php";
 ?>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,7 +97,7 @@
     }
 
     form {
-        /* height: 100%; */
+        margin: 0;
     }
     .info {
         border: 2px solid #ff002d;

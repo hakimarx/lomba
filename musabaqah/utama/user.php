@@ -1,7 +1,8 @@
 <?php
-
+include_once __DIR__ . "/../../global/class/userrole.php";
+openfor(["adminprov"]);
     function ekse($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){
@@ -46,7 +47,7 @@
     }
 
     function tampil($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $kolomtrue=$GLOBALS['kolomtrue'];
         $kolomfake=$GLOBALS['kolomfake'];
         $mquery=mysqli_query($koneksi,$query);

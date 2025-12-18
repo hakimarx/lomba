@@ -11,7 +11,7 @@
     }
     
     function ekse($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){
@@ -34,7 +34,7 @@
     function tampil(){
         $idgolongan=$GLOBALS['idgolongan'];
 
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $query="select *,(select nama from peserta where id=peserta2.idpeserta) as nama from peserta2 where idgolongan=$idgolongan";
         $mquery=mysqli_query($koneksi,$query);
         while($row=mysqli_fetch_array($mquery)){

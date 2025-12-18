@@ -3,13 +3,13 @@
 
     $vtabel="user_level";
     $querytabel="select * from $vtabel";
-    $kolomtrue=["nama","iduser_role"];
+    $kolomtrue=["nama","role"];
     $kolomfake=$kolomtrue;
     $vth=$kolomfake;
 
     $jskolom='let vkolom=["'.implode('","',$kolomtrue).'"];';
 
-    include "../global/class/crud.php"; 
+    include __DIR__ . "/../../global/class/crud.php"; 
     
 
 ?>
@@ -37,16 +37,7 @@
             <input type="hidden" name="crudid" id="crudid">
 	    <div class="isi">
     	    nama<input type="text" name="nama" required>
-    	    user role
-            <select name="iduser_role" required>
-                <option value="">-- pilih --</option>
-                <?php
-                    $data=getdata("select * from user_role");
-                    while($row=mysqli_fetch_array($data)){
-                        echo "<option value=$row[id]>$row[nama]</option>";
-                    }
-                ?>
-            </select>
+    	    role<input type="text" name="role" required placeholder="e.g., adminprov, adminkabko">
         </div>
         <div class=tombol>
             	<input type="button" value="batal" onclick=popup(false)>

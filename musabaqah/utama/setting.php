@@ -4,7 +4,7 @@
 die("for future use");
 
 function getdata(){
-    include "koneksi.php";
+    include __DIR__ . "/../koneksi.php";
     $query="select * from setting";
     $data=mysqli_query($koneksi,$query);
     $row=mysqli_fetch_array($data);
@@ -26,8 +26,8 @@ if(isset($_POST['cmdsimpan'])){
     $jmljuri=$_POST['jmljuri'];
 
     $query="update setting set waktu1='$waktu1',waktu2='$waktu2',jmljuri='$jmljuri'";
-    include "koneksi.php";
-    include "dbku.php";
+    include __DIR__ . "/../koneksi.php";
+    include __DIR__ . "/dbku.php";
     execute($koneksi,$query);
 }
 

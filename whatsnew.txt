@@ -1,0 +1,41 @@
+--------------------------------------------------------------------------------------------------------
+update hari ini
+--------------------------------------------------------------------------------------------------------
+
+
+musabaqah
+- viewing data peserta brdasarkan golongan (sebelumnya all peserta) (home>pendaftaran peserta)
+- re-add fungsionality tombol edit dan hapus pada user (menu>archived>user>add/edit/hapus
+- re-add fungsionality tombol edit dan hapus pada keahlian (menu>archived>keahlian>add/edit/hapus
+
+
+
+
+
+--------------------------------------------------------------------------------------------------------
+still not fixed
+--------------------------------------------------------------------------------------------------------
+
+anonymouse
+- user role, belum difix an codenya
+- upload data dari xml (semua data, belum di coding)
+
+emaqra
+- layout belum mengikuti  punyanya umusabaqah
+- mushaf, data juz 29 belum masuk ,http://localhost:81/x/mtq/global/tool/tabel.php?table=mushaf (juz 29 lupa ke input) (menu>mushaf madinah>pilih juz 29)
+- jumlah soal mfq masih fixed 15 soal (belum dikasih setting berapa soal)
+- (menu>tilawah&mhq>acak soal) bagian ayat mutasyabihat belum disertakan
+- halaman login, masih mengacu ke login musabaqah (halaman not found),
+
+
+musabaqah
+- event, input data,ketika ukuran lebih tinggi, layout kacau
+- event, isian 'batas umur' belum difungsikan
+- golongan,bobot/unsur/topik/pewaktu dan lainnya yg berhubungan dengan penilaian, belum difungsikan
+- (cabang>golongan>manage peserta), isian masih pakai code lama
+- (cabang>golongan>bidang>hakim), isian ktp,npwp,sertifikan dan yg lainnya, yg sudah pernah dibikin,belum di fix in codenya,
+- (archived>acaknomor), tiap golongan harus disetting dulu, min dan max acak. jika tidak, akan muncul 0 terus
+- (home>pendaftaran peserta),bagian foto belum decoding,kota/kelurahan/kecamatan/provinsi masih inputan manual (bukan dropdown dari database)
+- (home,show timer) agar berfungsi dengan benar,kodemenulink harus diset dulu di data golongan.
+- penilaian, fungsi krusial (home, mulai penilaian), belum decoding beserta varian2nya (mode grup, dst)
+- (archived>user). password masih kelihatan. dan didatabase masih berupa plain text

@@ -4,7 +4,7 @@
     $idgolongan=$_GET['idgolongan'];
     if($idgolongan=="") die("ada error");
 
-    include "koneksi.php";
+    include_once __DIR__ . "/../koneksi.php";
     $query="select *,
         (select count(1) from peserta2 where idgolongan=golongan.id) as jmlpeserta,
         (select count(1) from bidang where idgolongan=golongan.id) as jmlbidang from golongan
@@ -13,7 +13,7 @@
     $rowgolongan=mysqli_fetch_array($data);
 
     if(isset($_POST["simpandata"])){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $idpeserta=$_POST['idpeserta'];
         $nilai1=$_POST['nilai1'];
         $nilai2=$_POST['nilai2'];
@@ -24,7 +24,7 @@
     }
 
     function getinfo(){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         include_once "dbku.php";
         $rowgolongan=$GLOBALS['rowgolongan'];
         $event=getonedata("select nama from event where aktif=1;");

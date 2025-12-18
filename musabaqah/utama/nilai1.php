@@ -1,7 +1,7 @@
 <?php
 //digunakan di nilai0.php
 //tidak bisa disatukan karena nilai0. mengandung  menu utama
-    include "../dbku.php";
+    include __DIR__ . "/../dbku.php";
 ?>
 
 <?php

@@ -22,7 +22,7 @@
     <tr>
         <?php
             function getdata(){
-                include "koneksi.php";
+                include_once __DIR__ . "/../koneksi.php";
                 $query="select *,
                 (select nama from event where id=idevent) as event,
                 (select nama from event where id=idcabang) as cabang,

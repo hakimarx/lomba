@@ -8,7 +8,7 @@
     }
     
     function ekse($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){
@@ -27,7 +27,7 @@
     }
 
     function tampil(){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $query="select * from job ";
         $mquery=mysqli_query($koneksi,$query);
         while($row=mysqli_fetch_array($mquery)){

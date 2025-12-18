@@ -9,7 +9,7 @@
 
     $jskolom='let vkolom=["'.implode('","',$kolomtrue).'"];';
 
-    include "../global/class/crud.php"; 
+    include __DIR__ . "/../../global/class/crud.php"; 
     
 
 ?>

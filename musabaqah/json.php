@@ -1,6 +1,6 @@
 <?php
 
-        include "dbku.php";
+        include __DIR__ . "/dbku.php";
 
         if(isset($_GET['idcabang'])){
             header("Content-Type: application/json; charset=UTF-8");

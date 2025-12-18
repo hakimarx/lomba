@@ -2,28 +2,40 @@
 
 
 
+    function ensure_session(){
+        if(session_status() === PHP_SESSION_NONE){
+            if(!headers_sent()){
+                session_start();
+            }else{
+                @session_start();
+            }
+        }
+    }
     function setlogin($iduser){
-        session_start();
+        ensure_session();
         $_SESSION['islogin']=["iduser"=>$iduser];    
         session_write_close();    
     }
     function setlogout(){
-        session_start();
+        ensure_session();
         unset($_SESSION['islogin']);       
         session_write_close();    
     }
 
     function islogined(){
-        session_start();
+        ensure_session();
         $istrue=isset($_SESSION['islogin']);
         session_write_close();
         return $istrue;    
     }
     function getiduser(){
-        session_start();
-        $iduser=$_SESSION['islogin']["iduser"];
+        ensure_session();
+        if(isset($_SESSION['islogin']) && isset($_SESSION['islogin']["iduser"])){
+            $iduser=$_SESSION['islogin']["iduser"];
+            session_write_close();
+            return $iduser;
+        }
         session_write_close();
-        return $iduser;
-
+        return null;
     }
 ?>

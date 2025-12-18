@@ -43,7 +43,7 @@
     }
 
     function tampil(){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $query="select * from panitera ";
         $mquery=mysqli_query($koneksi,$query);
         while($row=mysqli_fetch_array($mquery)){

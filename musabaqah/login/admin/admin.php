@@ -1,10 +1,9 @@
-<head></head>
-
 <?php
-
-
+// start session before any output
+if(session_status() === PHP_SESSION_NONE){
+    session_start();
+}
 //cek logout
-session_start();
 if(isset($_GET['logout'])){
     $_SESSION['admin']="";
     header("location:index.php");
@@ -25,8 +24,7 @@ if(isset($_GET['page2'])){
 
 
 ?>
-
-
+<head></head>
 <style>
     * {
         box-sizing: border-box;

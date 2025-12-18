@@ -8,7 +8,8 @@
     }
     
     function ekse($query){
-        include "koneksi.php";
+        global $koneksi;
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){
@@ -27,7 +28,8 @@
     }
 
     function tampil(){
-        include "koneksi.php";
+        global $koneksi;
+        include_once __DIR__ . "/../koneksi.php";
         $query="select * from kafilah ";
         $mquery=mysqli_query($koneksi,$query);
         while($row=mysqli_fetch_array($mquery)){

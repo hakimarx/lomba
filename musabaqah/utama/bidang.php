@@ -14,7 +14,7 @@
     }
     
     function ekse($query){
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         mysqli_query($koneksi,$query) or die("ada error");
     }
     function hapus($id){
@@ -35,7 +35,7 @@
 
     function tampil(){
         $idgolongan=$GLOBALS['idgolongan'];
-        include "koneksi.php";
+        include_once __DIR__ . "/../koneksi.php";
         $query="select *,
         (select count(1) from hakim where idbidang=bidang.id) as jmlhakim
           from bidang where idgolongan=$idgolongan";

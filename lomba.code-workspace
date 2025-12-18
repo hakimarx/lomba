@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../xampp/htdocs/lomba"
+		},
+		{
+			"name": "lomba",
+			"path": "../../../xampp/htdocs/lomba/lomba"
+		}
+	],
+	"settings": {}
+}
