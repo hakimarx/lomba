@@ -46,6 +46,11 @@
 			<?php } ?>
 
 			<a href='?logout'>logout</a>
+			
+			<!-- Menu Insentif Gubernur Jatim -->
+			<?php if($role=='adminprov' || $role=='adminkabko'){ ?>
+				<a href='?page=utama&page2=insentif_gubernur' style="background:linear-gradient(135deg,#667eea,#764ba2);">🏆 Insentif Gubernur</a>
+			<?php } ?>
 
 			<a href='?page=utama&page2=allthetime'>all the time</a>
 <?php
