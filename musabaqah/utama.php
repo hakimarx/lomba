@@ -33,6 +33,7 @@ function getmenu()
 	<!-- Admin Kab/Ko Management -->
 	<?php if ($role == 'adminprov') { ?>
 		<a href='?page=utama&page2=admin_kabko' class='<?php echo $page2 == "admin_kabko" ? "aktif" : ""; ?>'>🏛️ Admin Kab/Ko</a>
+		<a href='?page=utama&page2=pengaturan' class='<?php echo $page2 == "pengaturan" ? "aktif" : ""; ?>'>⚙️ Pengaturan</a>
 	<?php } ?>
 
 	<!-- Hafidz Section -->
