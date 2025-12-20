@@ -1,0 +1,1 @@
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `view_user` AS select `user`.`id` AS `iduser`,`user`.`nama` AS `nama`,`user`.`iduser_level` AS `iduser_level`,`user_level`.`nama` AS `level`,`user_level`.`role` AS `role` from (`user` join `user_level` on(`user_level`.`id` = `user`.`iduser_level`))
