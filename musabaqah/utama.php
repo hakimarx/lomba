@@ -4,58 +4,98 @@ function getmenu()
 	global $role;
 	$ideventaktif = getonedata("select id from event where aktif=1");
 	$page2 = isset($_GET['page2']) ? $_GET['page2'] : '';
+
+	// Helper function to check if menu is active
+	$isActive = function ($pages) use ($page2) {
+		if (is_array($pages)) {
+			return in_array($page2, $pages) ? "aktif" : "";
+		}
+		return $page2 == $pages ? "aktif" : "";
+	};
+
+	// Check if any submenu in group is active
+	$groupActive = function ($pages) use ($page2) {
+		return in_array($page2, $pages) ? "aktif" : "";
+	};
 ?>
-	<!-- Master Data Group -->
-	<a href='?page=utama&page2=home' class='<?php echo $page2 == "home" ? "aktif" : ""; ?>'>🏠 Home</a>
-	<a href='?page=utama&page2=event' class='<?php echo $page2 == "event" ? "aktif" : ""; ?>'>📅 Event</a>
-	<a href='?page=utama&page2=kafilah' class='<?php echo $page2 == "kafilah" ? "aktif" : ""; ?>'>👥 Kafilah</a>
-	<a href='?page=utama&page2=cabang&idevent=<?php echo $ideventaktif ?>' class='<?php echo $page2 == "cabang" ? "aktif" : ""; ?>'>📂 Cabang</a>
+	<!-- 1. Home -->
+	<a href='?page=utama&page2=home' class='<?php echo $isActive("home"); ?>'>🏠 Home</a>
 
-	<!-- Penilaian Group -->
-	<a href='?page=utama&page2=nilai0' class='<?php echo $page2 == "nilai0" ? "aktif" : ""; ?>'>📝 Penilaian</a>
-	<a href='?page=utama&page2=lapnilai' class='<?php echo $page2 == "lapnilai" ? "aktif" : ""; ?>'>📊 Nilai</a>
-	<a target=_blank href='?page=cetak'>🖨️ Cetak</a>
+	<!-- 2. Pengaturan -->
+	<div class="menu-group">
+		<a class="menu-parent <?php echo $groupActive(["event", "cabang", "babak", "keahlian", "user", "user_level"]); ?>">⚙️ Pengaturan</a>
+		<div class="menu-dropdown">
+			<a href='?page=utama&page2=event' class='<?php echo $isActive("event"); ?>'>📅 Event</a>
+			<a href='?page=utama&page2=cabang&idevent=<?php echo $ideventaktif ?>' class='<?php echo $isActive("cabang"); ?>'>📂 Cabang</a>
+			<a href='?page=utama&page2=babak' class='<?php echo $isActive("babak"); ?>'>🔢 Babak</a>
+			<a href='?page=utama&page2=keahlian' class='<?php echo $isActive("keahlian"); ?>'>💼 Keahlian</a>
+			<a href='?page=utama&page2=user' class='<?php echo $isActive("user"); ?>'>👤 User</a>
+			<a href='?page=utama&page2=user_level' class='<?php echo $isActive("user_level"); ?>'>🔑 Level</a>
+			<?php if ($role == 'adminprov' || $role == 'role1') { ?>
+				<a href='?page=utama&page2=admin_kabko' class='<?php echo $isActive("admin_kabko"); ?>'>🏛️ Admin Kab/Ko</a>
+				<a href='?page=utama&page2=pengaturan' class='<?php echo $isActive("pengaturan"); ?>'>⚙️ Pengaturan User</a>
+			<?php } ?>
+		</div>
+	</div>
 
-	<!-- Peserta Group -->
-	<a href='?page=utama&page2=peserta_all' class='<?php echo $page2 == "peserta_all" ? "aktif" : ""; ?>'>👤 Peserta</a>
-	<a href='?page=utama&page2=orang' class='<?php echo $page2 == "orang" ? "aktif" : ""; ?>'>👤 Orang</a>
-	<a href='?page=utama&page2=panitera' class='<?php echo $page2 == "panitera" ? "aktif" : ""; ?>'>⚖️ Panitera</a>
+	<!-- 3. Pendaftaran -->
+	<div class="menu-group">
+		<a class="menu-parent <?php echo $groupActive(["kafilah", "panitera", "peserta_all", "hakim", "orang"]); ?>">📋 Pendaftaran</a>
+		<div class="menu-dropdown">
+			<a href='?page=utama&page2=kafilah' class='<?php echo $isActive("kafilah"); ?>'>👥 Kafilah</a>
+			<a href='?page=utama&page2=panitera' class='<?php echo $isActive("panitera"); ?>'>⚖️ Panitera</a>
+			<a href='?page=utama&page2=peserta_all' class='<?php echo $isActive("peserta_all"); ?>'>👤 Peserta</a>
+			<a href='?page=utama&page2=hakim' class='<?php echo $isActive("hakim"); ?>'>⚖️ Hakim</a>
+			<a href='?page=utama&page2=orang' class='<?php echo $isActive("orang"); ?>'>👤 Official</a>
+		</div>
+	</div>
 
-	<!-- Settings Group -->
-	<a href='?page=utama&page2=babak' class='<?php echo $page2 == "babak" ? "aktif" : ""; ?>'>🔢 Babak</a>
-	<a href='?page=utama&page2=keahlian' class='<?php echo $page2 == "keahlian" ? "aktif" : ""; ?>'>💼 Keahlian</a>
-	<a href='?page=utama&page2=_viewall' class='<?php echo $page2 == "_viewall" ? "aktif" : ""; ?>'>🌳 Hierarki</a>
+	<!-- 4. Penilaian -->
+	<div class="menu-group">
+		<a class="menu-parent <?php echo $groupActive(["nilai0", "lapnilai"]); ?>">📝 Penilaian</a>
+		<div class="menu-dropdown">
+			<a href='?page=utama&page2=nilai0' class='<?php echo $isActive("nilai0"); ?>'>✏️ Mulai Nilai</a>
+			<a href='?page=utama&page2=lapnilai' class='<?php echo $isActive("lapnilai"); ?>'>📊 Rekap Nilai</a>
+			<a target='_blank' href='?page=cetak'>🖨️ Cetak Nilai</a>
+		</div>
+	</div>
 
-	<!-- Users Group -->
-	<a href='?page=utama&page2=user' class='<?php echo $page2 == "user" ? "aktif" : ""; ?>'>👤 User</a>
-	<a href='?page=utama&page2=user_level' class='<?php echo $page2 == "user_level" ? "aktif" : ""; ?>'>🔑 Level</a>
+	<!-- 5. Emaqra -->
+	<div class="menu-group">
+		<a class="menu-parent <?php echo $groupActive(["emaqra_tilawah", "emaqra_qiraat", "emaqra_tafsir", "emaqra_mfq", "emaqra_mushaf", "emaqra_kategori"]); ?>">📖 Emaqra</a>
+		<div class="menu-dropdown">
+			<a href='?page=utama&page2=emaqra_tilawah' class='<?php echo $isActive("emaqra_tilawah"); ?>'>🎤 Tilawah & MHQ</a>
+			<a href='?page=utama&page2=emaqra_qiraat' class='<?php echo $isActive("emaqra_qiraat"); ?>'>📜 Qiraat</a>
+			<a href='?page=utama&page2=emaqra_tafsir' class='<?php echo $isActive("emaqra_tafsir"); ?>'>📚 Tafsir</a>
+			<a href='?page=utama&page2=emaqra_mfq' class='<?php echo $isActive("emaqra_mfq"); ?>'>📝 MFQ/Hadits</a>
+			<a href='?page=utama&page2=emaqra_mushaf&jenis=indonesia' class='<?php echo ($page2 == "emaqra_mushaf" && isset($_GET['jenis']) && $_GET['jenis'] == 'indonesia') ? "aktif" : ""; ?>'>📕 Mushaf Indonesia</a>
+			<a href='?page=utama&page2=emaqra_mushaf&jenis=madinah' class='<?php echo ($page2 == "emaqra_mushaf" && isset($_GET['jenis']) && $_GET['jenis'] == 'madinah') ? "aktif" : ""; ?>'>📗 Mushaf Madinah</a>
+			<a href='?page=utama&page2=emaqra_kategori' class='<?php echo $isActive("emaqra_kategori"); ?>'>📂 Kategori</a>
+		</div>
+	</div>
 
-	<!-- Admin Kab/Ko Management -->
-	<?php if ($role == 'adminprov') { ?>
-		<a href='?page=utama&page2=admin_kabko' class='<?php echo $page2 == "admin_kabko" ? "aktif" : ""; ?>'>🏛️ Admin Kab/Ko</a>
-		<a href='?page=utama&page2=pengaturan' class='<?php echo $page2 == "pengaturan" ? "aktif" : ""; ?>'>⚙️ Pengaturan</a>
+	<!-- 6. Tunjangan Huffadz -->
+	<?php if ($role == 'adminprov' || $role == 'adminkabko' || $role == 'role1' || $role == 'role2') { ?>
+		<div class="menu-group">
+			<a class="menu-parent <?php echo $groupActive(["hafidz", "hafidz_dashboard", "hafidz_nilai", "hafidz_reports", "hafidz_saran", "hafidz_rekening", "hafidz_transfer", "insentif_gubernur"]); ?>">💰 Tunjangan Huffadz</a>
+			<div class="menu-dropdown">
+				<a href='?page=utama&page2=hafidz' class='<?php echo $isActive("hafidz"); ?>'>📖 Data Hafidz</a>
+				<a href='?page=utama&page2=hafidz_dashboard' class='<?php echo $isActive("hafidz_dashboard"); ?>'>📈 Dashboard</a>
+				<a href='?page=utama&page2=hafidz_nilai' class='<?php echo $isActive("hafidz_nilai"); ?>'>✅ Penilaian</a>
+				<a href='?page=utama&page2=hafidz_reports' class='<?php echo $isActive("hafidz_reports"); ?>'>📋 Laporan</a>
+				<a href='?page=utama&page2=hafidz_saran' class='<?php echo $isActive("hafidz_saran"); ?>'>💬 Saran</a>
+				<a href='?page=utama&page2=hafidz_rekening' class='<?php echo $isActive("hafidz_rekening"); ?>'>💳 Rekening</a>
+				<?php if ($role == 'adminprov' || $role == 'role1') { ?>
+					<a href='?page=utama&page2=hafidz_transfer' class='<?php echo $isActive("hafidz_transfer"); ?>'>🔄 Transfer</a>
+				<?php } ?>
+				<a href='?page=utama&page2=insentif_gubernur' class='<?php echo $isActive("insentif_gubernur"); ?>'>🏆 Insentif Gubernur</a>
+			</div>
+		</div>
 	<?php } ?>
 
-	<!-- Hafidz Section -->
-	<a href='?page=utama&page2=hafidz' class='<?php echo $page2 == "hafidz" ? "aktif" : ""; ?>'>📖 Hafidz</a>
-	<?php if ($role == 'adminprov' || $role == 'adminkabko') { ?>
-		<a href='?page=utama&page2=hafidz_dashboard' class='<?php echo $page2 == "hafidz_dashboard" ? "aktif" : ""; ?>'>📈 Dashboard</a>
-		<a href='?page=utama&page2=hafidz_nilai' class='<?php echo $page2 == "hafidz_nilai" ? "aktif" : ""; ?>'>✅ Penilaian</a>
-		<a href='?page=utama&page2=hafidz_reports' class='<?php echo $page2 == "hafidz_reports" ? "aktif" : ""; ?>'>📋 Laporan</a>
-		<a href='?page=utama&page2=hafidz_saran' class='<?php echo $page2 == "hafidz_saran" ? "aktif" : ""; ?>'>💬 Saran</a>
-		<a href='?page=utama&page2=hafidz_rekening' class='<?php echo $page2 == "hafidz_rekening" ? "aktif" : ""; ?>'>💳 Rekening</a>
-	<?php } ?>
-	<?php if ($role == 'adminprov') { ?>
-		<a href='?page=utama&page2=hafidz_transfer' class='<?php echo $page2 == "hafidz_transfer" ? "aktif" : ""; ?>'>🔄 Transfer</a>
-	<?php } ?>
-
-	<!-- Insentif Gubernur -->
-	<?php if ($role == 'adminprov' || $role == 'adminkabko') { ?>
-		<a href='?page=utama&page2=insentif_gubernur' class='<?php echo $page2 == "insentif_gubernur" ? "aktif" : ""; ?>'>🏆 Insentif</a>
-	<?php } ?>
-
-	<!-- Tools -->
-	<a href='?page=utama&page2=acaknomor' class='<?php echo $page2 == "acaknomor" ? "aktif" : ""; ?>'>🎲 Acak Nomor</a>
+	<!-- Tools (hidden in dropdown for cleaner look) -->
+	<a href='?page=utama&page2=_viewall' class='<?php echo $isActive("_viewall"); ?>'>🌳 Hierarki</a>
+	<a href='?page=utama&page2=acaknomor' class='<?php echo $isActive("acaknomor"); ?>'>🎲 Acak</a>
 
 	<!-- Logout -->
 	<a href='?logout' class='logout-btn'>🚪 Logout</a>
@@ -132,6 +172,85 @@ if ($iduser) {
 	.menu .isi {
 		background: var(--bg-surface);
 		scrollbar-width: thin;
+	}
+
+	/* Dropdown Menu Overrides - Desktop */
+	@media (min-width: 786px) {
+		.menu .isi {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			overflow: visible !important;
+		}
+
+		.menu-group {
+			position: relative;
+			display: inline-block;
+		}
+
+		.menu-group>a.menu-parent {
+			cursor: pointer;
+		}
+
+		.menu-dropdown {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			min-width: 200px;
+			background: var(--bg-card, #1e293b);
+			border: 1px solid var(--border-color);
+			border-radius: 8px;
+			box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-10px);
+			transition: all 0.2s ease;
+			z-index: 1000;
+			display: block !important;
+		}
+
+		.menu-group:hover .menu-dropdown {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+
+		.menu-dropdown a {
+			display: block !important;
+			padding: 10px 16px !important;
+			border-right: none !important;
+			border-bottom: 1px solid var(--border-color);
+			white-space: nowrap;
+		}
+
+		.menu-dropdown a:last-child {
+			border-bottom: none;
+		}
+
+		.menu-dropdown a:hover {
+			background: rgba(16, 185, 129, 0.1) !important;
+			color: var(--primary-light) !important;
+		}
+	}
+
+	/* Mobile Dropdown */
+	@media (max-width: 785px) {
+		.menu-dropdown {
+			display: none;
+			position: static;
+			background: rgba(0, 0, 0, 0.2);
+			border: none;
+			border-radius: 0;
+		}
+
+		.menu-group.open .menu-dropdown {
+			display: block;
+		}
+
+		.menu-dropdown a {
+			padding-left: 32px !important;
+		}
 	}
 
 	/* Modern App Container */
@@ -261,7 +380,7 @@ if ($iduser) {
 <div class="modern-app-container">
 
 	<div class="modern-header-main">
-		<h2>✨ Musabaqah</h2>
+		<h2>🕌 E-LPTQ</h2>
 		<div class="subtitle">Sistem Manajemen Musabaqah & Hafidz</div>
 	</div>
 

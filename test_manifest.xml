@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Manifest name="Test Musabaqah 2025">
+    <Datas>
+        <Cabang name="TILAWAH TEST" type="penjurian1">
+            <Golongan name="TARTIL TEST" personil="1" gender="1" waktu="1" topik="0" time="5" warn="60">
+                <Bidang name="TAJWID TEST" min="0" max="40" urut="1" />
+            </Golongan>
+        </Cabang>
+    </Datas>
+</Manifest>

@@ -1,50 +1,55 @@
 <?php
-    if(isset($_POST['crud'])){
-        $mode=$_POST['crud'];
-        $crudid=$_POST['crudid'];
-        if($mode=="hapus") hapus($crudid);
-        if($mode=="tambah") tambah();
-        if($mode=="edit") edit($crudid);
-    }
-    
-    function ekse($query){
-        include "koneksi.php";
-        mysqli_query($koneksi,$query) or die("ada error");
-    }
-    function hapus($id){
-        $query="delete from kategori where id=$id";
-        ekse($query);
-    }
+if (isset($_POST['crud'])) {
+    $mode = $_POST['crud'];
+    $crudid = $_POST['crudid'];
+    if ($mode == "hapus") hapus($crudid);
+    if ($mode == "tambah") tambah();
+    if ($mode == "edit") edit($crudid);
+}
 
-    function tambah(){
-        $nama=$_POST['nama'];
-        $juzawal=$_POST['juzawal'];
-        $juzakhir=$_POST['juzakhir'];
-        $jmlsoal=$_POST['jmlsoal'];
-        $query="insert into kategori(nama,juzawal,juzakhir,jmlsoal) values('$nama','$juzawal','$juzakhir','$jmlsoal')";
-        ekse($query);
-    }
+function ekse($query)
+{
+    include_once __DIR__ . "/../../musabaqah/dbku.php";
+    execute($query);
+}
+function hapus($id)
+{
+    $query = "DELETE FROM golongan WHERE id=$id";
+    ekse($query);
+}
 
-    function edit($id){
-    	$nama=$_POST['nama'];
-        $juzawal=$_POST['juzawal'];
-        $juzakhir=$_POST['juzakhir'];
-        $jmlsoal=$_POST['jmlsoal'];
-        $query="update kategori set nama='$nama',juzawal='$juzawal',juzakhir='$juzakhir',jmlsoal='$jmlsoal' where id=$id";
-        ekse($query);
-    }
+function tambah()
+{
+    $nama = strtoupper($_POST['nama']);
+    $juzawal = $_POST['juzawal'];
+    $juzakhir = $_POST['juzakhir'];
+    $jmlsoal = $_POST['jmlsoal'];
+    $query = "INSERT INTO golongan (nama, juzawal, juzakhir, jmlsoal, idcabang, idbabak, jumlah_hakim) VALUES ('$nama', '$juzawal', '$juzakhir', '$jmlsoal', 1, 1, 5)";
+    ekse($query);
+}
 
-    function tampil(){
-        include "koneksi.php";
-        $query="select * from kategori ";
-        $mquery=mysqli_query($koneksi,$query);
-        while($row=mysqli_fetch_array($mquery)){
-            $id=$row['id'];
-            $nama=$row['nama'];
-            $juzawal=$row['juzawal'];
-            $juzakhir=$row['juzakhir'];
-            $jmlsoal=$row['jmlsoal'];
-            print("<tr>
+function edit($id)
+{
+    $nama = strtoupper($_POST['nama']);
+    $juzawal = $_POST['juzawal'];
+    $juzakhir = $_POST['juzakhir'];
+    $jmlsoal = $_POST['jmlsoal'];
+    $query = "UPDATE golongan SET nama='$nama', juzawal='$juzawal', juzakhir='$juzakhir', jmlsoal='$jmlsoal' WHERE id=$id";
+    ekse($query);
+}
+
+function tampil()
+{
+    include_once __DIR__ . "/../../musabaqah/dbku.php";
+    $query = "SELECT * FROM golongan WHERE jmlsoal > 0 ORDER BY nama";
+    $mquery = getdata($query);
+    while ($row = mysqli_fetch_array($mquery)) {
+        $id = $row['id'];
+        $nama = $row['nama'];
+        $juzawal = $row['juzawal'];
+        $juzakhir = $row['juzakhir'];
+        $jmlsoal = $row['jmlsoal'];
+        print("<tr>
                 <td class=padding id=tdnama$id>$nama</td>
                 <td id=tdjuzawal$id>$juzawal</td>
                 <td id=tdjuzakhir$id>$juzakhir</td>
@@ -52,39 +57,39 @@
                 <td><input class='button padding' type=button onclick='edit($id)' value=edit></td>
                 <td><input class='button padding' type=button value=hapus onclick='hapus($id);'></td>
             </tr>\n");
-        }
     }
+}
 
 ?>
 
 <script>
-
     function hapus(id) {
 
-        xconfirm("yakin ingin menghapus data ?",()=>{
+        xconfirm("yakin ingin menghapus data ?", () => {
             document.getElementById("crud").value = "hapus";
             document.getElementById("crudid").value = id;
             document.forms['formcrud'].submit();
         });
     }
 
-    function tambah(){
-        document.getElementById("crud").value="tambah";
+    function tambah() {
+        document.getElementById("crud").value = "tambah";
 
-        gi("nama").value="";
-        gi("juzawal").value="";
-        gi("juzakhir").value="";
-        gi("jmlsoal").value="";
-        popup(true);        
+        gi("nama").value = "";
+        gi("juzawal").value = "";
+        gi("juzakhir").value = "";
+        gi("jmlsoal").value = "";
+        popup(true);
     }
-    function edit(id){
-        document.getElementById("crud").value="edit";
-        document.getElementById("crudid").value=id;
 
-        gi("nama").value=gi("tdnama"+id).innerText;
-        gi("juzawal").value=gi("tdjuzawal"+id).innerText;
-        gi("juzakhir").value=gi("tdjuzakhir"+id).innerText;
-        gi("jmlsoal").value=gi("tdjmlsoal"+id).innerText;
+    function edit(id) {
+        document.getElementById("crud").value = "edit";
+        document.getElementById("crudid").value = id;
+
+        gi("nama").value = gi("tdnama" + id).innerText;
+        gi("juzawal").value = gi("tdjuzawal" + id).innerText;
+        gi("juzakhir").value = gi("tdjuzakhir" + id).innerText;
+        gi("jmlsoal").value = gi("tdjmlsoal" + id).innerText;
 
         popup(true);
 
@@ -98,18 +103,18 @@
 </head>
 
 <div class="vmaxwidth centermargin">
-    <h1>kategori</h1>
-    <input type="button" class="button padding" value="tambah data" onclick="tambah()" style="  margin-bottom: 11px;">
+    <h1>KATEGORI MHQ</h1>
+    <input type="button" class="modern-btn modern-btn-primary" value="➕ TAMBAH KATEGORI" onclick="tambah()" style="margin-bottom: 20px;">
     <table class="table widthfull">
         <tr class="fontsize2">
-       		<th class=padding>kategori</th>
+            <th class=padding>kategori</th>
             <th>juz awal</th>
             <th>juz akhir</th>
             <th>jumlah soal</th>
             <th>edit</th>
             <th>hapus</th>
         </tr>
-        <?php tampil();?>
+        <?php tampil(); ?>
     </table>
 </div>
 

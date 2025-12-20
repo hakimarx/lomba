@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Section id="EVENT">
+    <Key id="Nama" value="MUSABAQAH TEST"/>
+    <Key id="Lokasi" value="TEST CITY"/>
+  </Section>
+  <Section id="KAFILAH">
+    <Key id="1" value="KAFILAH TEST A"/>
+    <Key id="2" value="KAFILAH TEST B"/>
+  </Section>
+</Configuration>

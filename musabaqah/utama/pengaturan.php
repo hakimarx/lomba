@@ -1,9 +1,10 @@
 <?php
 include_once __DIR__ . "/../dbku.php";
 include_once __DIR__ . "/../../global/class/userrole.php";
+include_once __DIR__ . "/../../global/class/fungsi_config.php";
 
 // Only admin prov can access settings
-openfor(["adminprov"]);
+openfor(["adminprov", "role1"]);
 
 // Get current user info
 $iduser = getiduser();
@@ -47,6 +48,125 @@ if (isset($_POST['crud'])) {
         }
     }
 }
+
+// Handle system config updates
+if (isset($_POST['save_config'])) {
+    $mushaf_source = $_POST['mushaf_source'] ?? 'offline';
+    setConfig('mushaf_source', $mushaf_source);
+    $config_saved = true;
+}
+
+// XML Import: Manifest Lomba
+if (isset($_POST['import_manifest']) && isset($_FILES['xml_manifest'])) {
+    $xmlFile = $_FILES['xml_manifest']['tmp_name'];
+    if (file_exists($xmlFile)) {
+        $xml = @simplexml_load_file($xmlFile);
+        if ($xml) {
+            $idevent = $_GET['idevent'] ?? 1;
+            $import_count = 0;
+
+            foreach ($xml->Datas->Cabang as $cabXml) {
+                $cabName = strtoupper((string)$cabXml['name']);
+                $cabType = (string)$cabXml['type'];
+
+                $idpenilaian = getonedata("SELECT id FROM penilaian WHERE nama LIKE '%$cabType%' OR id='$cabType'") ?: 1;
+
+                $existingCab = getonebaris("SELECT id FROM cabang WHERE nama='$cabName' AND idevent=$idevent");
+                if ($existingCab) {
+                    $idcabang = $existingCab['id'];
+                    execute("UPDATE cabang SET idpenilaian='$idpenilaian' WHERE id=$idcabang");
+                } else {
+                    execute("INSERT INTO cabang (nama, idevent, idpenilaian) VALUES ('$cabName', $idevent, '$idpenilaian')");
+                    $idcabang = mysqli_insert_id($koneksi);
+                }
+
+                foreach ($cabXml->Golongan as $golXml) {
+                    $golName = strtoupper((string)$golXml['name']);
+                    $time_min = (int)$golXml['time'];
+                    $warn_sec = (int)$golXml['warn'];
+                    $topik = (int)$golXml['topik'];
+                    $juzawal = (int)$golXml['juzawal'] ?: 0;
+                    $juzakhir = (int)$golXml['juzakhir'] ?: 0;
+                    $jmlsoal = (int)$golXml['jmlsoal'] ?: 0;
+
+                    $existingGol = getonebaris("SELECT id FROM golongan WHERE nama='$golName' AND idcabang=$idcabang");
+                    if ($existingGol) {
+                        $idgolongan = $existingGol['id'];
+                        execute("UPDATE golongan SET waktupenilaian=$time_min, waktumenjelang=$warn_sec, istopik=$topik, juzawal=$juzawal, juzakhir=$juzakhir, jmlsoal=$jmlsoal WHERE id=$idgolongan");
+                    } else {
+                        execute("INSERT INTO golongan (nama, idcabang, waktupenilaian, waktumenjelang, istopik, jumlah_hakim, juzawal, juzakhir, jmlsoal) VALUES ('$golName', $idcabang, $time_min, $warn_sec, $topik, 5, $juzawal, $juzakhir, $jmlsoal)");
+                        $idgolongan = mysqli_insert_id($koneksi);
+                    }
+
+                    foreach ($golXml->Bidang as $bidXml) {
+                        $bidName = strtoupper((string)$bidXml['name']);
+                        $min = (int)$bidXml['min'];
+                        $max = (int)$bidXml['max'];
+                        $urut = (int)$bidXml['urut'];
+
+                        $existingBid = getonebaris("SELECT id FROM bidang WHERE nama='$bidName' AND idgolongan=$idgolongan");
+                        if ($existingBid) {
+                            execute("UPDATE bidang SET nmin=$min, nmax=$max, urut=$urut WHERE id=" . $existingBid['id']);
+                        } else {
+                            execute("INSERT INTO bidang (nama, idgolongan, nmin, nmax, urut) VALUES ('$bidName', $idgolongan, $min, $max, $urut)");
+                        }
+                    }
+                }
+                $import_count++;
+            }
+            $import_success = "MANIFEST LOMBA BERHASIL DI-IMPORT ($import_count CABANG)!";
+        } else {
+            $import_error = "FORMAT XML TIDAK VALID.";
+        }
+    }
+}
+
+// XML Import: Event Config
+if (isset($_POST['import_event']) && isset($_FILES['xml_event'])) {
+    $xmlFile = $_FILES['xml_event']['tmp_name'];
+    if (file_exists($xmlFile)) {
+        $xml = @simplexml_load_file($xmlFile);
+        if ($xml) {
+            foreach ($xml->Section as $section) {
+                $sectionId = strtoupper((string)$section['id']);
+
+                if ($sectionId == 'EVENT') {
+                    foreach ($section->Key as $key) {
+                        $kId = (string)$key['id'];
+                        $kval = (string)$key['value'];
+                        setConfig("event_" . strtolower($kId), $kval);
+                    }
+                }
+
+                if ($sectionId == 'KAFILAH') {
+                    foreach ($section->Key as $key) {
+                        $kafilahName = strtoupper((string)$key['value']);
+                        $existing = getonedata("SELECT id FROM wilayah WHERE nama='$kafilahName'");
+                        if (!$existing) {
+                            execute("INSERT INTO wilayah (nama) VALUES ('$kafilahName')");
+                        }
+                    }
+                }
+
+                if ($sectionId == 'JOB') {
+                    foreach ($section->Key as $key) {
+                        $jobName = strtoupper((string)$key['id']);
+                        $existing = getonedata("SELECT id FROM job WHERE nama='$jobName'");
+                        if (!$existing) {
+                            execute("INSERT INTO job (nama) VALUES ('$jobName')");
+                        }
+                    }
+                }
+            }
+            $import_success = "KONFIGURASI EVENT BERHASIL DI-IMPORT!";
+        } else {
+            $import_error = "FORMAT XML TIDAK VALID.";
+        }
+    }
+}
+
+// Get current config values
+$currentMushafSource = getConfig('mushaf_source', 'offline');
 
 // Get user lists by level
 function getUsersByLevel($levelId)
@@ -400,16 +520,19 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="showTab('adminprov')">👑 Admin Provinsi</button>
-        <button class="tab-btn" onclick="showTab('adminkabko')">🏛️ Admin Kab/Ko</button>
-        <button class="tab-btn" onclick="showTab('panitera')">⚖️ Panitera</button>
+        <button class="tab-btn active" onclick="showTab('adminprov')">👑 ADMIN PROVINSI</button>
+        <button class="tab-btn" onclick="showTab('adminkabko')">🏛️ ADMIN KAB/KO</button>
+        <button class="tab-btn" onclick="showTab('panitera')">⚖️ PANITERA</button>
+        <button class="tab-btn" onclick="showTab('import_manifest')">📋 IMPORT MANIFEST</button>
+        <button class="tab-btn" onclick="showTab('import_event')">📅 IMPORT EVENT</button>
+        <button class="tab-btn" onclick="showTab('sistem')">⚙️ SISTEM</button>
     </div>
 
     <!-- Tab Content: Admin Prov -->
     <div id="tab-adminprov" class="tab-content active">
         <div class="section-header">
-            <h2 class="section-title">👑 Daftar Admin Provinsi</h2>
-            <button class="btn-add" onclick="tambahUser('adminprov')">➕ Tambah Admin Prov</button>
+            <h2 class="section-title">👑 DAFTAR ADMIN PROVINSI</h2>
+            <button class="btn-add" onclick="tambahUser('adminprov')">➕ TAMBAH ADMIN PROV</button>
         </div>
 
         <?php if (mysqli_num_rows($adminProvUsers) > 0): ?>
@@ -455,8 +578,8 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
     <!-- Tab Content: Admin Kab/Ko -->
     <div id="tab-adminkabko" class="tab-content">
         <div class="section-header">
-            <h2 class="section-title">🏛️ Daftar Admin Kab/Ko</h2>
-            <button class="btn-add" onclick="tambahUser('adminkabko')">➕ Tambah Admin Kab/Ko</button>
+            <h2 class="section-title">🏛️ DAFTAR ADMIN KAB/KO</h2>
+            <button class="btn-add" onclick="tambahUser('adminkabko')">➕ TAMBAH ADMIN KAB/KO</button>
         </div>
 
         <?php if (mysqli_num_rows($adminKabkoUsers) > 0): ?>
@@ -500,8 +623,8 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
     <!-- Tab Content: Panitera -->
     <div id="tab-panitera" class="tab-content">
         <div class="section-header">
-            <h2 class="section-title">⚖️ Daftar Panitera</h2>
-            <button class="btn-add" onclick="tambahUser('panitera')">➕ Tambah Panitera</button>
+            <h2 class="section-title">⚖️ DAFTAR PANITERA</h2>
+            <button class="btn-add" onclick="tambahUser('panitera')">➕ TAMBAH PANITERA</button>
         </div>
 
         <?php if (mysqli_num_rows($paniteraUsers) > 0): ?>
@@ -541,7 +664,141 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
             </div>
         <?php endif; ?>
     </div>
+
+    <!-- Tab Content: Sistem -->
+    <div id="tab-sistem" class="tab-content">
+        <div class="section-header">
+            <h2 class="section-title">⚙️ Pengaturan Sistem</h2>
+        </div>
+
+        <?php if (isset($config_saved)): ?>
+            <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--primary); border-radius: 8px; padding: 12px; margin-bottom: 20px; color: var(--primary-light);">
+                ✅ Pengaturan berhasil disimpan!
+            </div>
+        <?php endif; ?>
+
+        <form method="post" action="">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px; margin-bottom: 20px;">
+                <h3 style="color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    📖 Sumber Gambar Mushaf
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">
+                    Pilih sumber gambar untuk menampilkan mushaf Al-Quran. Mode <strong>Online</strong> menghemat storage server dengan mengambil gambar dari API eksternal.
+                </p>
+
+                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                    <label style="flex: 1; min-width: 200px; cursor: pointer;">
+                        <input type="radio" name="mushaf_source" value="offline"
+                            <?php echo $currentMushafSource === 'offline' ? 'checked' : ''; ?>
+                            style="display: none;">
+                        <div class="source-option <?php echo $currentMushafSource === 'offline' ? 'active' : ''; ?>" onclick="selectSource(this, 'offline')">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">💾</div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Offline (Lokal)</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
+                                Gambar dari folder assets/mushaf/<br>
+                                ~530 MB storage
+                            </div>
+                        </div>
+                    </label>
+
+                    <label style="flex: 1; min-width: 200px; cursor: pointer;">
+                        <input type="radio" name="mushaf_source" value="online"
+                            <?php echo $currentMushafSource === 'online' ? 'checked' : ''; ?>
+                            style="display: none;">
+                        <div class="source-option <?php echo $currentMushafSource === 'online' ? 'active' : ''; ?>" onclick="selectSource(this, 'online')">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">🌐</div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Online (API)</div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
+                                Gambar dari everyayah.com<br>
+                                0 MB storage, butuh internet
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="submit" name="save_config" value="1" class="btn-save">💾 Simpan Pengaturan</button>
+                </div>
+            </div>
+        </form>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px;">
+            <h3 style="color: var(--text-primary); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                ℹ️ Informasi
+            </h3>
+            <ul style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.8; padding-left: 20px;">
+                <li><strong>Mode Offline:</strong> Semua gambar di-load dari server lokal. Lebih cepat, tapi butuh upload ~530MB ke server.</li>
+                <li><strong>Mode Online:</strong> Gambar di-load dari API everyayah.com. Hemat storage server, tapi butuh koneksi internet stabil.</li>
+                <li>Perubahan berlaku langsung setelah disimpan.</li>
+            </ul>
+        </div>
+    </div>
 </div>
+
+<!-- Tab Content: Import Manifest -->
+<div id="tab-import_manifest" class="tab-content">
+    <div class="section-header">
+        <h2 class="section-title">📋 IMPORT MANIFEST LOMBA</h2>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Unggah file XML manifest untuk mengatur Cabang, Golongan, dan Bidang Penilaian secara otomatis.
+        </p>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">File XML Manifest</label>
+                <input type="file" name="xml_manifest" class="form-input" accept=".xml" required>
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" name="import_manifest" class="btn-save">🚀 Jalankan Import</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Tab Content: Import Event -->
+<div id="tab-import_event" class="tab-content">
+    <div class="section-header">
+        <h2 class="section-title">📅 IMPORT KONFIGURASI EVENT</h2>
+    </div>
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 24px;">
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Unggah file XML konfigurasi untuk mengatur data Event, Daftar Kafilah (Wilayah), dan Role Staff.
+        </p>
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">File XML Konfigurasi</label>
+                <input type="file" name="xml_event" class="form-input" accept=".xml" required>
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" name="import_event" class="btn-save">🚀 Jalankan Import</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<style>
+    .source-option {
+        background: var(--bg-surface);
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .source-option:hover {
+        border-color: var(--primary);
+        background: var(--bg-card-hover);
+    }
+
+    .source-option.active {
+        border-color: var(--primary);
+        background: rgba(16, 185, 129, 0.1);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+</style>
 
 <!-- Modal Form -->
 <div class="modal-overlay" id="userModal">
@@ -677,4 +934,14 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
             closeModal();
         }
     });
+
+    // Select source option for mushaf settings
+    function selectSource(element, value) {
+        // Remove active class from all options
+        document.querySelectorAll('.source-option').forEach(el => el.classList.remove('active'));
+        // Add active class to selected option
+        element.classList.add('active');
+        // Check the corresponding radio button
+        document.querySelector('input[name="mushaf_source"][value="' + value + '"]').checked = true;
+    }
 </script>

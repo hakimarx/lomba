@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#10b981">
-    <meta name="description" content="Aplikasi manajemen perlombaan dan data Hafidz Jawa Timur">
+    <meta name="description" content="E-LPTQ: Sistem Manajemen Musabaqah & Hafidz Jawa Timur">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Musabaqah">
+    <meta name="apple-mobile-web-app-title" content="E-LPTQ">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
-    <title>Sistem Lomba - MTQ & Emaqra</title>
+    <title>E-LPTQ - Sistem Manajemen Musabaqah & Hafidz</title>
     <style>
         * {
             margin: 0;
@@ -21,121 +21,223 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1e2e 50%, #0f172a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before,
+        body::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        body::before {
+            width: 600px;
+            height: 600px;
+            background: rgba(16, 185, 129, 0.12);
+            top: -200px;
+            right: -100px;
+        }
+
+        body::after {
+            width: 400px;
+            height: 400px;
+            background: rgba(99, 102, 241, 0.1);
+            bottom: -150px;
+            left: -100px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            33% {
+                transform: translate(30px, -30px) rotate(5deg);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) rotate(-5deg);
+            }
         }
 
         .container {
-            max-width: 1200px;
+            position: relative;
+            z-index: 10;
             width: 100%;
+            max-width: 480px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         .header {
             text-align: center;
-            color: white;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 4em;
+            margin-bottom: 16px;
         }
 
         .header h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
         .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95em;
         }
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-align: center;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-icon {
-            font-size: 4em;
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .card h2 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.8em;
-        }
-
-        .card p {
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-
-        .card ul {
-            text-align: left;
-            margin-bottom: 25px;
-            color: #555;
-        }
-
-        .card ul li {
+        .form-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9em;
             margin-bottom: 8px;
-            list-style-position: inside;
+            font-weight: 500;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1em;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        .form-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            text-align: center;
         }
 
         .footer {
             text-align: center;
-            color: white;
-            margin-top: 50px;
-            opacity: 0.8;
+            margin-top: 32px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85em;
         }
 
-        @media (max-width: 768px) {
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.85em;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .divider span {
+            padding: 0 16px;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .quick-link {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.85em;
+            transition: all 0.2s ease;
+        }
+
+        .quick-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 32px 24px;
+            }
+
             .header h1 {
                 font-size: 2em;
             }
 
-            .card {
-                padding: 30px;
+            .logo {
+                font-size: 3em;
             }
         }
     </style>
@@ -143,62 +245,66 @@
 
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🕌 Sistem Lomba</h1>
-            <p>Pilih aplikasi yang ingin Anda gunakan</p>
-        </div>
-
-        <div class="cards">
-            <!-- Musabaqah Card -->
-            <div class="card">
-                <div class="card-icon">📊</div>
-                <h2>MTQ Management</h2>
-                <p>Sistem manajemen Musabaqah Tilawatil Quran lengkap dengan fitur administrasi dan penilaian</p>
-                <ul>
-                    <li>Manajemen Event & Peserta</li>
-                    <li>Sistem Penilaian</li>
-                    <li>Manajemen Hafidz</li>
-                    <li>Laporan & Rekap</li>
-                    <li>Multi-level Admin</li>
-                </ul>
-                <a href="musabaqah/" class="btn">Masuk ke MTQ</a>
+        <div class="login-card">
+            <div class="header">
+                <div class="logo">🕌</div>
+                <h1>E-LPTQ</h1>
+                <p>Sistem Manajemen Musabaqah & Hafidz</p>
             </div>
 
-            <!-- Emaqra Card -->
-            <div class="card">
-                <div class="card-icon">📖</div>
-                <h2>Emaqra Tools</h2>
-                <p>Aplikasi pembelajaran Al-Quran dengan berbagai fitur untuk membantu hafalan dan pemahaman</p>
-                <ul>
-                    <li>Tilawah & MHQ</li>
-                    <li>Tafsir Al-Quran</li>
-                    <li>Mushaf Digital</li>
-                    <li>Qiraat</li>
-                    <li>MFQ/Hadits</li>
-                </ul>
-                <a href="emaqra/" class="btn btn-secondary">Buka Emaqra</a>
+            <?php
+            // Process login
+            $login_error = "";
+            if (!empty($_POST['username'])) {
+                include_once __DIR__ . "/global/class/fungsi.php";
+                include_once __DIR__ . "/musabaqah/dbku.php";
+                include_once __DIR__ . "/musabaqah/login/sesi.php";
+
+                $username = $_POST['username'];
+                $passwd = $_POST['passwd'];
+
+                $query = "select * from user where username='$username' and password='$passwd' limit 1";
+                $datauser = getdata($query);
+                if (mysqli_num_rows($datauser) == 1) {
+                    $rowuser = mysqli_fetch_array($datauser);
+                    setlogin($rowuser['id']);
+                    header("location:musabaqah/?page=utama");
+                    exit;
+                } else {
+                    $login_error = "Login gagal! Username atau password salah.";
+                }
+            }
+
+            if ($login_error): ?>
+                <div class="error-message"><?php echo $login_error; ?></div>
+            <?php endif; ?>
+
+            <form method="post" action="">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-input" placeholder="Masukkan username" required autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="passwd" class="form-input" placeholder="Masukkan password" required>
+                </div>
+
+                <button type="submit" class="btn-login">🔐 Masuk</button>
+            </form>
+
+            <div class="divider">
+                <span>atau</span>
             </div>
 
-            <!-- Hafidz Card -->
-            <div class="card">
-                <div class="card-icon">📚</div>
-                <h2>Portal Hafidz</h2>
-                <p>Portal khusus untuk Hafidz melaporkan kegiatan harian dan mengisi profil</p>
-                <ul>
-                    <li>Login Hafidz</li>
-                    <li>Laporan Harian</li>
-                    <li>Update Profil</li>
-                    <li>Saran & Masukan</li>
-                </ul>
-                <a href="musabaqah/hafidz/login.php" class="btn" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">Login Hafidz</a>
+            <div class="quick-links">
+                <a href="musabaqah/hafidz/login.php" class="quick-link">📚 Login Hafidz</a>
+                <a href="emaqra/" class="quick-link">📖 Emaqra Tools</a>
             </div>
-        </div>
 
-        <div class="footer">
-            <p>&copy; 2025 Sistem Lomba. All rights reserved.</p>
-            <button id="installBtn" style="display:none; margin-top: 15px; padding: 10px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold;">
-                📱 Install App
-            </button>
+            <div class="footer">
+                <p>&copy; 2025 E-LPTQ. All rights reserved.</p>
+            </div>
         </div>
     </div>
 
@@ -215,33 +321,6 @@
                     });
             });
         }
-
-        // PWA Install Prompt
-        let deferredPrompt;
-        const installBtn = document.getElementById('installBtn');
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.style.display = 'inline-block';
-        });
-
-        installBtn.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const {
-                    outcome
-                } = await deferredPrompt.userChoice;
-                console.log('Install outcome:', outcome);
-                deferredPrompt = null;
-                installBtn.style.display = 'none';
-            }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            console.log('App installed!');
-            installBtn.style.display = 'none';
-        });
     </script>
 </body>
 

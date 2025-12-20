@@ -2,6 +2,24 @@
 include __DIR__ . "/../../global/class/fungsi.php";
 include __DIR__ . "/../dbku.php";
 include __DIR__ . "/sesi.php";
+
+// Process login BEFORE any HTML output
+$login_error = "";
+if (!empty($_POST['username'])) {
+    $username = $_POST['username'];
+    $passwd = $_POST['passwd'];
+
+    $query = "select * from user where username='$username' and password='$passwd' limit 1";
+    $datauser = getdata($query);
+    if (mysqli_num_rows($datauser) == 1) {
+        $rowuser = mysqli_fetch_array($datauser);
+        setlogin($rowuser['id']);
+        header("location:../?page=utama");
+        exit;
+    } else {
+        $login_error = "Login gagal! Username atau password salah.";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -283,22 +301,11 @@ include __DIR__ . "/sesi.php";
 
 <body>
 
-    <?php
-    if (!empty($_POST['username'])) {
-        $username = $_POST['username'];
-        $passwd = $_POST['passwd'];
-
-        $query = "select * from user where username='$username' and password='$passwd' limit 1";
-        $datauser = getdata($query);
-        if (mysqli_num_rows($datauser) == 1) {
-            $rowuser = mysqli_fetch_array($datauser);
-            setlogin($rowuser['id']);
-            header("location:../?page=utama");
-        } else {
-            echo "<script>alert('Login gagal! Username atau password salah.');</script>";
-        }
-    }
-    ?>
+    <?php if (!empty($login_error)): ?>
+        <script>
+            alert('<?php echo $login_error; ?>');
+        </script>
+    <?php endif; ?>
 
     <div class="login-container">
         <div class="login-card">
