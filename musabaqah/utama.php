@@ -48,6 +48,11 @@ function getmenu()
 		<a href='?page=utama&page2=hafidz_transfer' class='<?php echo $page2 == "hafidz_transfer" ? "aktif" : ""; ?>'>🔄 Transfer</a>
 	<?php } ?>
 
+	<!-- Insentif Gubernur -->
+	<?php if ($role == 'adminprov' || $role == 'adminkabko') { ?>
+		<a href='?page=utama&page2=insentif_gubernur' class='<?php echo $page2 == "insentif_gubernur" ? "aktif" : ""; ?>'>🏆 Insentif</a>
+	<?php } ?>
+
 	<!-- Tools -->
 	<a href='?page=utama&page2=acaknomor' class='<?php echo $page2 == "acaknomor" ? "aktif" : ""; ?>'>🎲 Acak Nomor</a>
 
