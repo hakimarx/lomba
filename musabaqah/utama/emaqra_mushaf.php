@@ -537,9 +537,14 @@ $suratData = [
         <button class="timer-btn" onclick="startTimer()">▶ mulai</button>
 
         <!-- Zoom Controls - MOVED HERE near timer -->
+        <!-- Zoom Controls -->
         <div class="zoom-controls">
             <button class="zoom-btn" onclick="zoomMushaf(10)" title="Zoom In">+</button>
             <button class="zoom-btn" onclick="zoomMushaf(-10)" title="Zoom Out">−</button>
+        </div>
+
+        <!-- Navigation Controls - MOVED BELOW ZOOM -->
+        <div class="zoom-controls" style="margin-top: 10px;">
             <button class="zoom-btn" onclick="prevPage()" title="Halaman Sebelumnya">◀</button>
             <button class="zoom-btn" onclick="nextPage()" title="Halaman Berikutnya">▶</button>
         </div>
@@ -802,23 +807,23 @@ $suratData = [
         const phase3End = phase2End + timerSettings.menjelang;
         const phase4End = phase3End + timerSettings.habis;
 
-        // Calculate time for each phase
+        // Calculate time for each phase (Continuous/Cumulative)
         let times = [0, 0, 0, 0];
 
         if (totalSeconds <= phase1End) {
             times[0] = totalSeconds;
         } else if (totalSeconds <= phase2End) {
-            times[0] = timerSettings.persiapan;
-            times[1] = totalSeconds - phase1End;
+            times[0] = phase1End;
+            times[1] = totalSeconds;
         } else if (totalSeconds <= phase3End) {
-            times[0] = timerSettings.persiapan;
-            times[1] = timerSettings.penilaian;
-            times[2] = totalSeconds - phase2End;
+            times[0] = phase1End;
+            times[1] = phase2End;
+            times[2] = totalSeconds;
         } else {
-            times[0] = timerSettings.persiapan;
-            times[1] = timerSettings.penilaian;
-            times[2] = timerSettings.menjelang;
-            times[3] = Math.min(totalSeconds - phase3End, timerSettings.habis);
+            times[0] = phase1End;
+            times[1] = phase2End;
+            times[2] = phase3End;
+            times[3] = Math.min(totalSeconds, phase4End);
         }
 
         // Update display

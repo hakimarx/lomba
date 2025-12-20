@@ -1,3 +1,26 @@
+<?php
+// Process login at the very top to prevent "headers already sent" error
+$login_error = "";
+if (!empty($_POST['username'])) {
+    include_once __DIR__ . "/global/class/fungsi.php";
+    include_once __DIR__ . "/musabaqah/dbku.php";
+    include_once __DIR__ . "/musabaqah/login/sesi.php";
+
+    $username = $_POST['username'];
+    $passwd = $_POST['passwd'];
+
+    $query = "select * from user where username='$username' and password='$passwd' limit 1";
+    $datauser = getdata($query);
+    if (mysqli_num_rows($datauser) == 1) {
+        $rowuser = mysqli_fetch_array($datauser);
+        setlogin($rowuser['id']);
+        header("location:musabaqah/?page=utama");
+        exit;
+    } else {
+        $login_error = "Login gagal! Username atau password salah.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -253,28 +276,6 @@
             </div>
 
             <?php
-            // Process login
-            $login_error = "";
-            if (!empty($_POST['username'])) {
-                include_once __DIR__ . "/global/class/fungsi.php";
-                include_once __DIR__ . "/musabaqah/dbku.php";
-                include_once __DIR__ . "/musabaqah/login/sesi.php";
-
-                $username = $_POST['username'];
-                $passwd = $_POST['passwd'];
-
-                $query = "select * from user where username='$username' and password='$passwd' limit 1";
-                $datauser = getdata($query);
-                if (mysqli_num_rows($datauser) == 1) {
-                    $rowuser = mysqli_fetch_array($datauser);
-                    setlogin($rowuser['id']);
-                    header("location:musabaqah/?page=utama");
-                    exit;
-                } else {
-                    $login_error = "Login gagal! Username atau password salah.";
-                }
-            }
-
             if ($login_error): ?>
                 <div class="error-message"><?php echo $login_error; ?></div>
             <?php endif; ?>
