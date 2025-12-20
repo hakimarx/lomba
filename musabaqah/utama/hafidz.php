@@ -38,7 +38,18 @@ if (isset($_POST['action']) && $_POST['action'] == 'pindah_kabko') {
     $tujuan = $_POST['tujuan_pindah'];
     execute("update hafidz set status='pindah_request', tujuan_pindah='$tujuan' where id=$id");
     alert("Permintaan pindah berhasil dikirim.");
-    header("location:hafidz.php");
+    header("location:?page=utama&page2=hafidz");
+    exit;
+}
+
+// Handle KabKo Incentive Verification
+if (isset($_POST['action']) && $_POST['action'] == 'verifikasi_kabko') {
+    $id = $_POST['id'];
+    $status = $_POST['status_insentif_kabko'];
+    $catatan = mysqli_real_escape_string($GLOBALS['koneksi'], $_POST['catatan_insentif_kabko']);
+    execute("update hafidz set status_insentif_kabko='$status', catatan_insentif_kabko='$catatan', tgl_insentif_kabko=NOW(), verifikator_insentif_kabko=$iduser where id=$id");
+    alert("Status verifikasi Kab/Ko diperbarui.");
+    header("location:?page=utama&page2=hafidz");
     exit;
 }
 
@@ -116,8 +127,9 @@ function settd()
         echo "<td><input type=button onclick='edit($id)' value=edit></td>";
         echo "<td><input type=button value=hapus onclick='hapus($id);'></td>";
         echo "<td>
-                    <button onclick='laporMeninggal($id, \"$row[nama]\")'>Meninggal</button>
-                    <button onclick='pindahKabko($id, \"$row[nama]\")'>Pindah</button>
+                    <button class='btn btn-warning' onclick='laporMeninggal($id, \"$row[nama]\")'>Meninggal</button>
+                    <button class='btn btn-primary' onclick='pindahKabko($id, \"$row[nama]\")'>Pindah</button>
+                    " . ($row['is_insentif_kabko'] ? "<button class='btn btn-success' onclick='verifKabko($id, \"$row[nama]\")'>Verif KabKo</button>" : "") . "
                 </td>";
         echo "</tr>\n";
     }
@@ -126,16 +138,21 @@ function settd()
 
 <?php
 $vtabel = "hafidz";
+$filter_kabko = isset($_GET['filter_kabko']) ? $_GET['filter_kabko'] : '';
+$where = "";
 if ($role_name == 'admin prov') {
-    $querytabel = "select * from $vtabel";
+    $where = "1=1";
 } else {
-    // Admin Kab/Ko only sees their region and active/pending (maybe not moved ones? prompt says "memindahkan hafidz yang mau pindah", so they should see them)
-    // Prompt says "sesuai dari daerah kab/ko nya masing-masing".
-    $querytabel = "select * from $vtabel where kab_kota='$user_kab_kota'";
+    $where = "kab_kota='$user_kab_kota'";
 }
-$kolomtrue = ["tahun_anggaran", "periode", "asal", "nik", "nama", "nama_lengkap", "tempat_lahir", "tanggal_lahir", "umur", "jk", "alamat", "rt", "rw", "desa", "desa_kelurahan", "kecamatan", "kab_kota", "jumlah_hafalan_juz", "lembaga_tahfidz", "nama_pembimbing", "tahun_khatam", "no_sertifikat_tahfidz", "status_mengajar", "nama_lembaga_mengajar", "tmt_mengajar", "telepon", "keterangan", "lulus", "username", "password", "idkafilah", "nama_bank", "no_rekening", "atas_nama_rekening"];
+if ($filter_kabko !== '') {
+    $where .= " AND is_insentif_kabko='$filter_kabko'";
+}
+$querytabel = "select * from $vtabel where $where";
+
+$kolomtrue = ["tahun_anggaran", "periode", "asal", "nik", "nama", "nama_lengkap", "tempat_lahir", "tanggal_lahir", "umur", "jk", "alamat", "rt", "rw", "desa", "desa_kelurahan", "kecamatan", "kab_kota", "jumlah_hafalan_juz", "lembaga_tahfidz", "nama_pembimbing", "tahun_khatam", "no_sertifikat_tahfidz", "status_mengajar", "nama_lembaga_mengajar", "tmt_mengajar", "telepon", "keterangan", "lulus", "is_insentif_kabko", "status_insentif_kabko", "username", "password", "idkafilah", "nama_bank", "no_rekening", "atas_nama_rekening"];
 $kolomfake = $kolomtrue;
-$vth = ["Thn Anggaran", "Periode", "Asal", "NIK", "Nama", "Nama Lengkap", "TMPT Lahir", "Tgl Lahir", "Umur", "JK", "Alamat", "RT", "RW", "Desa", "Desa/Kel", "Kec", "Kab/Kota", "Jml Juz", "Lembaga Tahfidz", "Pembimbing", "Thn Khatam", "No Sertifikat", "Stat Mengajar", "Lembaga Mengajar", "TMT Mengajar", "Telepon", "Keterangan", "Lulus", "Username", "Password", "ID Kafilah", "Nama Bank", "No Rekening", "Atas Nama"];
+$vth = ["Thn Anggaran", "Periode", "Asal", "NIK", "Nama", "Nama Lengkap", "TMPT Lahir", "Tgl Lahir", "Umur", "JK", "Alamat", "RT", "RW", "Desa", "Desa/Kel", "Kec", "Kab/Kota", "Jml Juz", "Lembaga Tahfidz", "Pembimbing", "Thn Khatam", "No Sertifikat", "Stat Mengajar", "Lembaga Mengajar", "TMT Mengajar", "Telepon", "Keterangan", "Lulus", "Insentif KabKo", "Stat Insentif", "Username", "Password", "ID Kafilah", "Nama Bank", "No Rekening", "Atas Nama"];
 
 $jskolom = 'let vkolom=["' . implode('","', $kolomtrue) . '"]';
 
@@ -158,8 +175,15 @@ if (isset($_POST['crud'])) {
 <head></head>
 
 <div class=judul>
-    <h1>data <?php echo $vtabel; ?></h1>
-    <input class="button padding panel" type="button" value="tambah data" onclick=tambah()>
+    <h1>📖 data <?php echo $vtabel; ?></h1>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <select onchange="window.location.href='?page=utama&page2=hafidz&filter_kabko='+this.value" class="padding">
+            <option value="">-- Semua (Insentif) --</option>
+            <option value="1" <?php echo $filter_kabko == '1' ? 'selected' : ''; ?>>Ya (Insentif Kab Ko)</option>
+            <option value="0" <?php echo $filter_kabko == '0' ? 'selected' : ''; ?>>Tidak</option>
+        </select>
+        <input class="button padding panel" type="button" value="+ tambah data" onclick=tambah()>
+    </div>
 </div>
 <div style="overflow:auto">
     <?php showtabel(); ?>
@@ -199,6 +223,11 @@ if (isset($_POST['crud'])) {
                 </select>
                 nama lembaga mengajar<input type="text" name="nama_lembaga_mengajar">
                 tmt mengajar<input type="date" name="tmt_mengajar">
+                insentif kab ko<select name="is_insentif_kabko">
+                    <option value="0">Tidak</option>
+                    <option value="1">Ya</option>
+                </select>
+                status insentif kab ko<input type="text" name="status_insentif_kabko" readonly>
                 telepon<input type="text" name="telepon">
                 keterangan<textarea name="keterangan"></textarea>
                 lulus<select name="lulus">
@@ -266,6 +295,28 @@ if (isset($_POST['crud'])) {
     </div>
 </div>
 
+<!-- Modal Verifikasi KabKo -->
+<div class="popup" id="popupVerifKabko" style="display:none;">
+    <div class="box">
+        <h3>Verifikasi Insentif Kab/Ko</h3>
+        <p id="namaVerifKabko"></p>
+        <form action="" method="post">
+            <input type="hidden" name="action" value="verifikasi_kabko">
+            <input type="hidden" name="id" id="idVerifKabko">
+            Status <select name="status_insentif_kabko" required>
+                <option value="Pending">Pending</option>
+                <option value="Diterima">Diterima</option>
+                <option value="Ditolak">Ditolak</option>
+            </select><br><br>
+            Catatan <textarea name="catatan_insentif_kabko" rows="3"></textarea><br>
+            <div class="tombol">
+                <input type="button" value="Batal" onclick="document.getElementById('popupVerifKabko').style.display='none'">
+                <input type="submit" value="Simpan Verifikasi">
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function laporMeninggal(id, nama) {
         document.getElementById('idMeninggal').value = id;
@@ -277,5 +328,11 @@ if (isset($_POST['crud'])) {
         document.getElementById('idPindah').value = id;
         document.getElementById('namaPindah').innerText = nama;
         document.getElementById('popupPindah').style.display = 'flex';
+    }
+
+    function verifKabko(id, nama) {
+        document.getElementById('idVerifKabko').value = id;
+        document.getElementById('namaVerifKabko').innerText = nama;
+        document.getElementById('popupVerifKabko').style.display = 'flex';
     }
 </script>
