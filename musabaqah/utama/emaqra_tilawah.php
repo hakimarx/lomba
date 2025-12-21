@@ -8,17 +8,19 @@
 
 <style>
     .emaqra-container {
-        background: white;
+        background: var(--bg-card);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
         border-radius: 10px;
         padding: 20px;
         min-height: 500px;
     }
 
     .emaqra-container h2 {
-        color: #1e3c72;
+        color: var(--primary-light);
         margin-bottom: 20px;
         padding-bottom: 10px;
-        border-bottom: 2px solid #667eea;
+        border-bottom: 2px solid var(--primary);
     }
 
     .emaqra-container iframe {

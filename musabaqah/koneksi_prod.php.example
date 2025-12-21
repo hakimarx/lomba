@@ -1,0 +1,12 @@
+<?php
+/**
+ * PRODUCTION DATABASE CREDENTIALS TEMPLATE
+ * Copy this file to koneksi_prod.php and fill in your credentials
+ * koneksi_prod.php will NOT be committed to Git
+ */
+
+// Production server credentials
+$prod_host = "localhost";
+$prod_user = "YOUR_DB_USERNAME";
+$prod_pass = "YOUR_DB_PASSWORD";
+$prod_db = "YOUR_DB_NAME";

@@ -21,6 +21,18 @@ function getmenu()
 	<!-- 1. Home -->
 	<a href='?page=utama&page2=home' class='<?php echo $isActive("home"); ?>'>🏠 Home</a>
 
+	<!-- 1.5. Portal Hafiz (Special for Hafiz Role) -->
+	<?php if ($role == 'hafiz') { ?>
+		<div class="menu-group">
+			<a class="menu-parent <?php echo $groupActive(["hafiz_dashboard", "hafiz_laporan", "hafiz_dokumen"]); ?>">📖 Portal Hafiz</a>
+			<div class="menu-dropdown">
+				<a href='?page=utama&page2=hafiz_dashboard' class='<?php echo $isActive("hafiz_dashboard"); ?>'>📊 Dashboard Saya</a>
+				<a href='?page=utama&page2=hafiz_laporan' class='<?php echo $isActive("hafiz_laporan"); ?>'>📝 Laporan Harian</a>
+				<a href='?page=utama&page2=hafiz_dokumen' class='<?php echo $isActive("hafiz_dokumen"); ?>'>📁 Dokumen Saya</a>
+			</div>
+		</div>
+	<?php } ?>
+
 	<!-- 2. Pengaturan -->
 	<div class="menu-group">
 		<a class="menu-parent <?php echo $groupActive(["event", "cabang", "babak", "keahlian", "user", "user_level"]); ?>">⚙️ Pengaturan</a>
@@ -77,17 +89,14 @@ function getmenu()
 	<!-- 6. Tunjangan Huffadz -->
 	<?php if ($role == 'adminprov' || $role == 'adminkabko' || $role == 'role1' || $role == 'role2') { ?>
 		<div class="menu-group">
-			<a class="menu-parent <?php echo $groupActive(["hafidz", "hafidz_dashboard", "hafidz_nilai", "hafidz_reports", "hafidz_saran", "hafidz_rekening", "hafidz_transfer", "insentif_gubernur"]); ?>">💰 Tunjangan Huffadz</a>
+			<a class="menu-parent <?php echo $groupActive(["hafidz", "hafidz_dashboard", "hafidz_nilai", "hafidz_reports", "hafidz_saran", "hafidz_rekening", "hafidz_transfer", "insentif_gubernur", "verifikasi_laporan"]); ?>">💰 Tunjangan Huffadz</a>
 			<div class="menu-dropdown">
 				<a href='?page=utama&page2=hafidz' class='<?php echo $isActive("hafidz"); ?>'>📖 Data Hafidz</a>
+				<a href='?page=utama&page2=verifikasi_laporan' class='<?php echo $isActive("verifikasi_laporan"); ?>'>✅ Verif Laporan</a>
 				<a href='?page=utama&page2=hafidz_dashboard' class='<?php echo $isActive("hafidz_dashboard"); ?>'>📈 Dashboard</a>
 				<a href='?page=utama&page2=hafidz_nilai' class='<?php echo $isActive("hafidz_nilai"); ?>'>✅ Penilaian</a>
-				<a href='?page=utama&page2=hafidz_reports' class='<?php echo $isActive("hafidz_reports"); ?>'>📋 Laporan</a>
-				<a href='?page=utama&page2=hafidz_saran' class='<?php echo $isActive("hafidz_saran"); ?>'>💬 Saran</a>
+				<a href='?page=utama&page2=hafidz_reports' class='<?php echo $isActive("hafidz_reports"); ?>'>📋 Laporan Rekap</a>
 				<a href='?page=utama&page2=hafidz_rekening' class='<?php echo $isActive("hafidz_rekening"); ?>'>💳 Rekening</a>
-				<?php if ($role == 'adminprov' || $role == 'role1') { ?>
-					<a href='?page=utama&page2=hafidz_transfer' class='<?php echo $isActive("hafidz_transfer"); ?>'>🔄 Transfer</a>
-				<?php } ?>
 				<a href='?page=utama&page2=insentif_gubernur' class='<?php echo $isActive("insentif_gubernur"); ?>'>🏆 Insentif Gubernur</a>
 			</div>
 		</div>

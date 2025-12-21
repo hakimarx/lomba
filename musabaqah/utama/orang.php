@@ -148,7 +148,7 @@ function tampil()
 </head>
 
 <div class="vmaxwidth centermargin">
-    <h1>data orang</h1>
+    <h1>DAFTAR KAFILAH</h1>
     <input class="button padding panel" type="button" value="tambah data" onclick=tambah()>
     <table class=table>
         <?php tampil(); ?>
@@ -160,61 +160,60 @@ function tampil()
         <form action="" method="post" name=formcrud>
             <input type="hidden" name="crud" id="crud">
             <input type="hidden" name="crudid" id="crudid">
+            <div class="isian">
+                <div class="isi">
+                    nama<input type="text" name="nama" required>
+                    pob<input type="text" name="pob" required>
+                    dob<input type="date" name="dob" required>
 
+                    gender
+                    <select name="idgender" required>
+                        <option value="">-- pilih gender --</option>
+                        <?php
+                        $data = getdata("select * from gender");
+                        while ($row = mysqli_fetch_array($data)) {
+                            $label = $row['nama'];
+                            $vid = $row['id'];
+                            echo "<option value=$vid>$label</option>";
+                        }
+                        ?>
+                    </select>
+
+
+                    job
+                    <select name="idjob" required>
+                        <option value="">-- pilih job --</option>
+                        <?php
+                        $data = getdata("select * from job");
+                        while ($row = mysqli_fetch_array($data)) {
+                            $label = $row['nama'];
+                            $vid = $row['id'];
+                            echo "<option value=$vid>$label</option>";
+                        }
+                        ?>
+                    </select>
+
+                    kafilah
+                    <select name="idkafilah" id="" required>
+                        <option value="">-- pilih kafilah --</option>
+                        <?php
+                        $data = getdata("select * from kafilah");
+                        while ($row = mysqli_fetch_array($data)) {
+                            $label = $row['nama'];
+                            $vid = $row['id'];
+                            echo "<option value=$vid>$label</option>";
+                        }
+                        ?>
+                    </select>
+                    kontak<input type="text" name="kontak" required>
+
+                </div>
+                <div class=footer>
+                    <input class="button padding" type="button" value="batal" onclick=popup(false)>
+                    <input class="button padding" type="submit" value="simpan">
+                </div>
+
+            </div>
         </form>
-        <div class="isian">
-            <div class="isi">
-                nama<input type="text" name="nama" required>
-                pob<input type="text" name="pob" required>
-                dob<input type="date" name="dob" required>
-
-                gender
-                <select name="idgender" required>
-                    <option value="">-- pilih gender --</option>
-                    <?php
-                    $data = getdata("select * from gender");
-                    while ($row = mysqli_fetch_array($data)) {
-                        $label = $row['nama'];
-                        $vid = $row['id'];
-                        echo "<option value=$vid>$label</option>";
-                    }
-                    ?>
-                </select>
-
-
-                job
-                <select name="idjob" required>
-                    <option value="">-- pilih job --</option>
-                    <?php
-                    $data = getdata("select * from job");
-                    while ($row = mysqli_fetch_array($data)) {
-                        $label = $row['nama'];
-                        $vid = $row['id'];
-                        echo "<option value=$vid>$label</option>";
-                    }
-                    ?>
-                </select>
-
-                kafilah
-                <select name="idkafilah" id="" required>
-                    <option value="">-- pilih kafilah --</option>
-                    <?php
-                    $data = getdata("select * from kafilah");
-                    while ($row = mysqli_fetch_array($data)) {
-                        $label = $row['nama'];
-                        $vid = $row['id'];
-                        echo "<option value=$vid>$label</option>";
-                    }
-                    ?>
-                </select>
-                kontak<input type="text" name="kontak" required>
-
-            </div>
-            <div class=footer>
-                <input class="button padding" type="button" value="batal" onclick=popup(false)>
-                <input class="button padding" type="submit" value="simpan">
-            </div>
-
-        </div>
     </div>
 </div>

@@ -1,16 +1,32 @@
 <?php
+
+/**
+ * Database Connection Configuration
+ * 
+ * Production credentials are loaded from koneksi_prod.php (not in Git)
+ * For production setup, copy koneksi_prod.php.example to koneksi_prod.php
+ * and fill in your credentials.
+ */
 $urlhost = $_SERVER['HTTP_HOST'];
 
 if ($urlhost != "vx2f.cloud") {
+    // Local development (XAMPP)
     $host = "localhost";
     $user = "root";
     $pass = "";
     $db = "xmaqra";
 } else {
-    $host = "localhost";
-    $user = "vx2f9948_user";
-    $pass = "vx2f9948_pass";
-    $db = "vx2f9948_db";
+    // Production - load from separate config file (not in Git)
+    $prodConfigFile = __DIR__ . '/koneksi_prod.php';
+    if (file_exists($prodConfigFile)) {
+        include $prodConfigFile;
+        $host = $prod_host ?? "localhost";
+        $user = $prod_user ?? "";
+        $pass = $prod_pass ?? "";
+        $db = $prod_db ?? "";
+    } else {
+        die("Production config file not found. Please create koneksi_prod.php from koneksi_prod.php.example");
+    }
 }
 
 try {

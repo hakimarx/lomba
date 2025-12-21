@@ -609,6 +609,35 @@ a:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: var(--bg-card, #1e293b);
+    color: var(--text-primary);
+}
+
+/* Alert/Confirm Legacy Box Fixes */
+.alert .box,
+.confirm .box {
+    background: var(--bg-card, #1e293b) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+.alert .isi,
+.confirm .isi {
+    color: var(--text-primary) !important;
+}
+
+.alert .judul,
+.confirm .judul {
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+}
+
+.alert .close,
+.confirm .close,
+.confirm .ya,
+.confirm .tidak {
+    background: var(--primary) !important;
+    color: white !important;
 }
 
 .modal {
@@ -797,9 +826,14 @@ a:hover {
     transition: background 0.2s ease;
 }
 
+.table tbody tr {
+    background: var(--bg-card, #1e293b) !important;
+}
+
 .table tbody tr:hover td {
     background: var(--bg-card-hover, rgba(51, 65, 85, 0.5));
 }
+
 
 .table tbody tr:last-child td {
     border-bottom: none;

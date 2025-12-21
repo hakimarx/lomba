@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Credentials and sensitive files
+koneksi_prod.php
+.env
+.env.local
+.env.production
+*.key
+*.pem
+
+# Logs
+*.log
+logs/
+
+# Cache
+cache/
+*.cache
+
+# Temporary files
+*.tmp
+tmp/
+temp/
+
+# Debug/test files
+check_*.php
+list_*.php
+save_*.php
+fix_*.php
+sync_*.php
+add_*.php
+create_test*.php
+*_cols.txt
+view_*.txt
+
+# Large SQL files (keep only schema in docs)
+xmaqra.sql
+
+# Build files
+*.bak
+*.backup
+

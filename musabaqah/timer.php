@@ -196,6 +196,36 @@ $rowgolongan = getonebaris("select * from golongan where id=$idgolongan");
 
         <button class="timer-btn" id="ctrl-btn" onclick="toggleTimer()">▶ Mulai</button>
 
+        <!-- Zoom Controls -->
+        <div style="display: flex; gap: 10px; justify-content: center; margin: 10px 0;">
+            <button onclick="zoomMushaf(10)" style="width: 50px; height: 50px; border-radius: 10px; border: none; background: #f39c12; color: white; font-size: 20px; cursor: pointer;">+</button>
+            <button onclick="zoomMushaf(-10)" style="width: 50px; height: 50px; border-radius: 10px; border: none; background: #f39c12; color: white; font-size: 20px; cursor: pointer;">−</button>
+            <button onclick="prevPage()" style="width: 50px; height: 50px; border-radius: 10px; border: none; background: #3498db; color: white; font-size: 20px; cursor: pointer;">◀</button>
+            <button onclick="nextPage()" style="width: 50px; height: 50px; border-radius: 10px; border: none; background: #3498db; color: white; font-size: 20px; cursor: pointer;">▶</button>
+        </div>
+
+        <!-- Search Surat & Pilih Halaman/Juz -->
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-top: 10px;">
+            <label style="display: block; color: rgba(255,255,255,0.7); font-size: 12px; margin-bottom: 6px;">🔍 Cari Surat</label>
+            <input type="text" id="searchSurat" placeholder="Ketik nama surat..."
+                style="width: 100%; padding: 10px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px; box-sizing: border-box; margin-bottom: 8px;">
+
+            <input type="number" id="inputAyat" placeholder="Ayat ke..." min="1"
+                style="width: 100%; padding: 8px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px; box-sizing: border-box; margin-bottom: 8px;">
+
+            <button onclick="goToSuratAyat()" style="width: 100%; padding: 10px; border: none; border-radius: 8px; background: linear-gradient(135deg, #27ae60 0%, #1e8449 100%); color: white; font-weight: bold; cursor: pointer;">📖 Buka</button>
+
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <input type="number" id="inputHal" placeholder="hlm" min="1" max="604" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px;">
+                <button onclick="goToPage()" style="padding: 8px 15px; border: none; border-radius: 8px; background: #3498db; color: white; cursor: pointer;">pilih</button>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <input type="number" id="inputJuz" placeholder="juz" min="1" max="30" style="flex: 1; padding: 8px; border: none; border-radius: 8px; background: rgba(255,255,255,0.1); color: white; font-size: 14px;">
+                <button onclick="goToJuz()" style="padding: 8px 15px; border: none; border-radius: 8px; background: #3498db; color: white; cursor: pointer;">pilih</button>
+            </div>
+        </div>
+
         <div class="info-box">
             <h4>📋 Pengaturan Waktu</h4>
             <p>Persiapan: <?php echo $rowgolongan['waktupersiapan']; ?>s</p>
@@ -345,5 +375,176 @@ $rowgolongan = getonebaris("select * from golongan where id=$idgolongan");
         let menit = Math.floor(vdetik / 60);
         let detik = vdetik % 60;
         return String(menit).padStart(2, '0') + ":" + String(detik).padStart(2, '0');
+    }
+
+    // ==========================================
+    // MUSHAF CONTROL FUNCTIONS (via iframe)
+    // ==========================================
+
+    let mushafFrame = null;
+    let currentPage = 1;
+    let zoomLevel = 100;
+
+    // Juz to page mapping
+    const juzPages = [1, 22, 42, 62, 82, 102, 121, 142, 162, 182, 201, 222, 242, 262, 282, 302, 322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582];
+
+    // Surat search mapping (approximate pages)
+    const suratData = [{
+            no: 1,
+            nama: "Al-Fatihah",
+            page: 1
+        }, {
+            no: 2,
+            nama: "Al-Baqarah",
+            page: 2
+        },
+        {
+            no: 3,
+            nama: "Ali 'Imran",
+            page: 50
+        }, {
+            no: 4,
+            nama: "An-Nisa",
+            page: 77
+        },
+        {
+            no: 5,
+            nama: "Al-Ma'idah",
+            page: 106
+        }, {
+            no: 6,
+            nama: "Al-An'am",
+            page: 128
+        },
+        {
+            no: 7,
+            nama: "Al-A'raf",
+            page: 151
+        }, {
+            no: 36,
+            nama: "Ya-Sin",
+            page: 440
+        },
+        {
+            no: 55,
+            nama: "Ar-Rahman",
+            page: 531
+        }, {
+            no: 56,
+            nama: "Al-Waqi'ah",
+            page: 534
+        },
+        {
+            no: 67,
+            nama: "Al-Mulk",
+            page: 562
+        }, {
+            no: 78,
+            nama: "An-Naba",
+            page: 582
+        },
+        {
+            no: 112,
+            nama: "Al-Ikhlas",
+            page: 604
+        }, {
+            no: 114,
+            nama: "An-Nas",
+            page: 604
+        }
+    ];
+
+    document.addEventListener("DOMContentLoaded", () => {
+        mushafFrame = document.querySelector('.timer-main iframe');
+    });
+
+    function sendToMushaf(action, value) {
+        // Try to communicate with the mushaf iframe
+        if (mushafFrame && mushafFrame.contentWindow) {
+            try {
+                mushafFrame.contentWindow.postMessage({
+                    action,
+                    value
+                }, '*');
+            } catch (e) {
+                console.log("Cannot access iframe:", e);
+            }
+        }
+    }
+
+    function zoomMushaf(delta) {
+        zoomLevel += delta;
+        if (zoomLevel < 50) zoomLevel = 50;
+        if (zoomLevel > 200) zoomLevel = 200;
+        sendToMushaf('zoom', zoomLevel);
+        // Fallback: try direct access
+        try {
+            if (mushafFrame.contentDocument) {
+                const img = mushafFrame.contentDocument.getElementById('mushafImg');
+                if (img) img.style.width = zoomLevel + '%';
+            }
+        } catch (e) {}
+    }
+
+    function nextPage() {
+        currentPage++;
+        if (currentPage > 604) currentPage = 1;
+        sendToMushaf('goToPage', currentPage);
+        updateMushafDirectly();
+    }
+
+    function prevPage() {
+        currentPage--;
+        if (currentPage < 1) currentPage = 604;
+        sendToMushaf('goToPage', currentPage);
+        updateMushafDirectly();
+    }
+
+    function goToPage() {
+        let page = parseInt(document.getElementById('inputHal').value);
+        if (page >= 1 && page <= 604) {
+            currentPage = page;
+            sendToMushaf('goToPage', currentPage);
+            updateMushafDirectly();
+        }
+    }
+
+    function goToJuz() {
+        let juz = parseInt(document.getElementById('inputJuz').value);
+        if (juz >= 1 && juz <= 30) {
+            currentPage = juzPages[juz - 1];
+            sendToMushaf('goToPage', currentPage);
+            updateMushafDirectly();
+        }
+    }
+
+    function goToSuratAyat() {
+        const suratName = document.getElementById('searchSurat').value.toLowerCase();
+        const surat = suratData.find(s => s.nama.toLowerCase().includes(suratName));
+        if (surat) {
+            currentPage = surat.page;
+            sendToMushaf('goToPage', currentPage);
+            updateMushafDirectly();
+        } else {
+            alert('Surat tidak ditemukan');
+        }
+    }
+
+    function updateMushafDirectly() {
+        // Fallback: directly update iframe URL for mushaf pages
+        try {
+            if (mushafFrame.contentDocument) {
+                const img = mushafFrame.contentDocument.getElementById('mushafImg');
+                if (img) {
+                    // Detect extension
+                    const currentSrc = img.src;
+                    const ext = currentSrc.includes('.png') ? 'png' : 'jpg';
+                    const basePath = currentSrc.substring(0, currentSrc.lastIndexOf('/') + 1);
+                    img.src = basePath + currentPage + '.' + ext;
+                }
+            }
+        } catch (e) {
+            console.log("Direct access failed, using postMessage");
+        }
     }
 </script>

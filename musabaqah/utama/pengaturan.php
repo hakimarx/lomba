@@ -33,17 +33,18 @@ if (isset($_POST['crud'])) {
         $levelMap = [
             'adminprov' => 100,
             'adminkabko' => 101,
-            'panitera' => 103
+            'panitera' => 103,
+            'hafiz' => 104
         ];
         $iduser_level = $levelMap[$userType] ?? 100;
 
         if ($mode == "tambah") {
-            $columns = ["username", "nama", "password", "iduser_level", "kab_kota"];
-            $values = [$username, $nama, $password, $iduser_level, $kab_kota];
+            $columns = ["username", "nama", "password", "iduser_level", "kab_kota", "nik"];
+            $values = [$username, $nama, $password, $iduser_level, $kab_kota, $_POST['nik'] ?? ''];
             dbinsert("user", $columns, $values);
         } else {
-            $columns = ["username", "nama", "password", "iduser_level", "kab_kota"];
-            $values = [$username, $nama, $password, $iduser_level, $kab_kota];
+            $columns = ["username", "nama", "password", "iduser_level", "kab_kota", "nik"];
+            $values = [$username, $nama, $password, $iduser_level, $kab_kota, $_POST['nik'] ?? ''];
             dbupdate("user", $columns, $values, "WHERE id=$crudid");
         }
     }
@@ -67,21 +68,24 @@ if (isset($_POST['import_manifest']) && isset($_FILES['xml_manifest'])) {
 
             foreach ($xml->Datas->Cabang as $cabXml) {
                 $cabName = strtoupper((string)$cabXml['name']);
+                $cabNameE = dbescape($cabName);
                 $cabType = (string)$cabXml['type'];
+                $cabTypeE = dbescape($cabType);
 
-                $idpenilaian = getonedata("SELECT id FROM penilaian WHERE nama LIKE '%$cabType%' OR id='$cabType'") ?: 1;
+                $idpenilaian = getonedata("SELECT id FROM penilaian WHERE nama LIKE '%$cabTypeE%' OR id='$cabTypeE'") ?: 1;
 
-                $existingCab = getonebaris("SELECT id FROM cabang WHERE nama='$cabName' AND idevent=$idevent");
+                $existingCab = getonebaris("SELECT id FROM cabang WHERE nama='$cabNameE' AND idevent=$idevent");
                 if ($existingCab) {
                     $idcabang = $existingCab['id'];
                     execute("UPDATE cabang SET idpenilaian='$idpenilaian' WHERE id=$idcabang");
                 } else {
-                    execute("INSERT INTO cabang (nama, idevent, idpenilaian) VALUES ('$cabName', $idevent, '$idpenilaian')");
+                    execute("INSERT INTO cabang (nama, idevent, idpenilaian) VALUES ('$cabNameE', $idevent, '$idpenilaian')");
                     $idcabang = mysqli_insert_id($koneksi);
                 }
 
                 foreach ($cabXml->Golongan as $golXml) {
                     $golName = strtoupper((string)$golXml['name']);
+                    $golNameE = dbescape($golName);
                     $time_min = (int)$golXml['time'];
                     $warn_sec = (int)$golXml['warn'];
                     $topik = (int)$golXml['topik'];
@@ -89,26 +93,27 @@ if (isset($_POST['import_manifest']) && isset($_FILES['xml_manifest'])) {
                     $juzakhir = (int)$golXml['juzakhir'] ?: 0;
                     $jmlsoal = (int)$golXml['jmlsoal'] ?: 0;
 
-                    $existingGol = getonebaris("SELECT id FROM golongan WHERE nama='$golName' AND idcabang=$idcabang");
+                    $existingGol = getonebaris("SELECT id FROM golongan WHERE nama='$golNameE' AND idcabang=$idcabang");
                     if ($existingGol) {
                         $idgolongan = $existingGol['id'];
                         execute("UPDATE golongan SET waktupenilaian=$time_min, waktumenjelang=$warn_sec, istopik=$topik, juzawal=$juzawal, juzakhir=$juzakhir, jmlsoal=$jmlsoal WHERE id=$idgolongan");
                     } else {
-                        execute("INSERT INTO golongan (nama, idcabang, waktupenilaian, waktumenjelang, istopik, jumlah_hakim, juzawal, juzakhir, jmlsoal) VALUES ('$golName', $idcabang, $time_min, $warn_sec, $topik, 5, $juzawal, $juzakhir, $jmlsoal)");
+                        execute("INSERT INTO golongan (nama, idcabang, waktupenilaian, waktumenjelang, istopik, jumlah_hakim, juzawal, juzakhir, jmlsoal) VALUES ('$golNameE', $idcabang, $time_min, $warn_sec, $topik, 5, $juzawal, $juzakhir, $jmlsoal)");
                         $idgolongan = mysqli_insert_id($koneksi);
                     }
 
                     foreach ($golXml->Bidang as $bidXml) {
                         $bidName = strtoupper((string)$bidXml['name']);
+                        $bidNameE = dbescape($bidName);
                         $min = (int)$bidXml['min'];
                         $max = (int)$bidXml['max'];
                         $urut = (int)$bidXml['urut'];
 
-                        $existingBid = getonebaris("SELECT id FROM bidang WHERE nama='$bidName' AND idgolongan=$idgolongan");
+                        $existingBid = getonebaris("SELECT id FROM bidang WHERE nama='$bidNameE' AND idgolongan=$idgolongan");
                         if ($existingBid) {
                             execute("UPDATE bidang SET nmin=$min, nmax=$max, urut=$urut WHERE id=" . $existingBid['id']);
                         } else {
-                            execute("INSERT INTO bidang (nama, idgolongan, nmin, nmax, urut) VALUES ('$bidName', $idgolongan, $min, $max, $urut)");
+                            execute("INSERT INTO bidang (nama, idgolongan, nmin, nmax, urut) VALUES ('$bidNameE', $idgolongan, $min, $max, $urut)");
                         }
                     }
                 }
@@ -131,29 +136,38 @@ if (isset($_POST['import_event']) && isset($_FILES['xml_event'])) {
                 $sectionId = strtoupper((string)$section['id']);
 
                 if ($sectionId == 'EVENT') {
-                    foreach ($section->Key as $key) {
-                        $kId = (string)$key['id'];
-                        $kval = (string)$key['value'];
-                        setConfig("event_" . strtolower($kId), $kval);
+                    // Search children case-insensitively
+                    foreach ($section->children() as $key) {
+                        if (strtoupper($key->getName()) == 'KEY') {
+                            $kId = (string)$key['id'];
+                            $kval = (string)$key['value'];
+                            setConfig("event_" . strtolower($kId), $kval);
+                        }
                     }
                 }
 
                 if ($sectionId == 'KAFILAH') {
-                    foreach ($section->Key as $key) {
-                        $kafilahName = strtoupper((string)$key['value']);
-                        $existing = getonedata("SELECT id FROM wilayah WHERE nama='$kafilahName'");
-                        if (!$existing) {
-                            execute("INSERT INTO wilayah (nama) VALUES ('$kafilahName')");
+                    foreach ($section->children() as $key) {
+                        if (strtoupper($key->getName()) == 'KEY') {
+                            $kafilahName = strtoupper((string)$key['value']);
+                            $kafilahNameE = dbescape($kafilahName);
+                            $existing = getonedata("SELECT id FROM wilayah WHERE nama='$kafilahNameE'");
+                            if (!$existing) {
+                                execute("INSERT INTO wilayah (nama) VALUES ('$kafilahNameE')");
+                            }
                         }
                     }
                 }
 
                 if ($sectionId == 'JOB') {
-                    foreach ($section->Key as $key) {
-                        $jobName = strtoupper((string)$key['id']);
-                        $existing = getonedata("SELECT id FROM job WHERE nama='$jobName'");
-                        if (!$existing) {
-                            execute("INSERT INTO job (nama) VALUES ('$jobName')");
+                    foreach ($section->children() as $key) {
+                        if (strtoupper($key->getName()) == 'KEY') {
+                            $jobName = strtoupper((string)$key['id']);
+                            $jobNameE = dbescape($jobName);
+                            $existing = getonedata("SELECT id FROM job WHERE nama='$jobNameE'");
+                            if (!$existing) {
+                                execute("INSERT INTO job (nama) VALUES ('$jobNameE')");
+                            }
                         }
                     }
                 }
@@ -182,6 +196,7 @@ function getUsersByLevel($levelId)
 $adminProvUsers = getUsersByLevel(100);
 $adminKabkoUsers = getUsersByLevel(101);
 $paniteraUsers = getUsersByLevel(103);
+$hafizUsers = getUsersByLevel(104);
 
 // Get kabupaten list for dropdown
 $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS NOT NULL AND kab_kota != '' ORDER BY kab_kota");
@@ -462,6 +477,11 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
         color: #fbbf24;
     }
 
+    .badge-hafiz {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
+
     .empty-state {
         text-align: center;
         padding: 40px;
@@ -516,6 +536,10 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
             <div class="stat-number"><?php echo mysqli_num_rows($paniteraUsers); ?></div>
             <div class="stat-label">Panitera</div>
         </div>
+        <div class="stat-card">
+            <div class="stat-number"><?php echo mysqli_num_rows($hafizUsers); ?></div>
+            <div class="stat-label">Hafiz</div>
+        </div>
     </div>
 
     <!-- Tabs -->
@@ -523,10 +547,24 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
         <button class="tab-btn active" onclick="showTab('adminprov')">👑 ADMIN PROVINSI</button>
         <button class="tab-btn" onclick="showTab('adminkabko')">🏛️ ADMIN KAB/KO</button>
         <button class="tab-btn" onclick="showTab('panitera')">⚖️ PANITERA</button>
+        <button class="tab-btn" onclick="showTab('hafiz')">📖 HAFIZ</button>
         <button class="tab-btn" onclick="showTab('import_manifest')">📋 IMPORT MANIFEST</button>
         <button class="tab-btn" onclick="showTab('import_event')">📅 IMPORT EVENT</button>
         <button class="tab-btn" onclick="showTab('sistem')">⚙️ SISTEM</button>
     </div>
+
+    <!-- Alert Messages -->
+    <?php if (isset($import_success)): ?>
+        <div style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--primary); border-radius: 8px; padding: 16px; margin-bottom: 20px; color: var(--primary-light); display: flex; align-items: center; gap: 10px;">
+            <span>✅</span> <?php echo $import_success; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($import_error)): ?>
+        <div style="background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 8px; padding: 16px; margin-bottom: 20px; color: #f87171; display: flex; align-items: center; gap: 10px;">
+            <span>❌</span> <?php echo $import_error; ?>
+        </div>
+    <?php endif; ?>
 
     <!-- Tab Content: Admin Prov -->
     <div id="tab-adminprov" class="tab-content active">
@@ -661,6 +699,53 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
             <div class="empty-state">
                 <div class="empty-state-icon">⚖️</div>
                 <p>Belum ada Panitera</p>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- Tab Content: Hafiz -->
+    <div id="tab-hafiz" class="tab-content">
+        <div class="section-header">
+            <h2 class="section-title">📖 DAFTAR HAFIZ</h2>
+            <button class="btn-add" onclick="tambahUser('hafiz')">➕ TAMBAH HAFIZ</button>
+        </div>
+
+        <?php if (mysqli_num_rows($hafizUsers) > 0): ?>
+            <?php mysqli_data_seek($hafizUsers, 0); ?>
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Nama</th>
+                        <th>NIK</th>
+                        <th>Kab/Kota</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = mysqli_fetch_array($hafizUsers)): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['username']); ?></td>
+                            <td><?php echo htmlspecialchars($row['nama']); ?></td>
+                            <td><?php echo htmlspecialchars($row['nik'] ?? '-'); ?></td>
+                            <td><?php echo htmlspecialchars($row['kab_kota'] ?? '-'); ?></td>
+                            <td>
+                                <button class="action-btn btn-edit"
+                                    onclick="editUser(<?php echo $row['id']; ?>, 'hafiz', '<?php echo addslashes($row['username']); ?>', '<?php echo addslashes($row['nama']); ?>', '<?php echo addslashes($row['password']); ?>', '<?php echo addslashes($row['kab_kota'] ?? ''); ?>', '<?php echo addslashes($row['nik'] ?? ''); ?>')">
+                                    ✏️ Edit
+                                </button>
+                                <button class="action-btn btn-delete" onclick="hapusUser(<?php echo $row['id']; ?>)">
+                                    🗑️ Hapus
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <div class="empty-state">
+                <div class="empty-state-icon">📖</div>
+                <p>Belum ada Hafiz</p>
             </div>
         <?php endif; ?>
     </div>
@@ -824,6 +909,11 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
                 <input type="text" name="password" id="input_password" class="form-input" required>
             </div>
 
+            <div class="form-group" id="nik_group" style="display: none;">
+                <label class="form-label">NIK (16 Digit)</label>
+                <input type="text" name="nik" id="input_nik" class="form-input" maxlength="16">
+            </div>
+
             <div class="form-group" id="kabkota_group" style="display: none;">
                 <label class="form-label">Kabupaten/Kota</label>
                 <select name="kab_kota" id="input_kab_kota" class="form-select">
@@ -861,7 +951,8 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
         // Show selected tab
-        document.getElementById('tab-' + tabName).classList.add('active');
+        const tabEl = document.getElementById('tab-' + tabName);
+        if (tabEl) tabEl.classList.add('active');
         event.target.classList.add('active');
     }
 
@@ -873,46 +964,44 @@ $kabupatenList = getdata("SELECT DISTINCT kab_kota FROM hafidz WHERE kab_kota IS
         document.getElementById('input_nama').value = '';
         document.getElementById('input_password').value = '';
         document.getElementById('input_kab_kota').value = '';
-
-        // Show/hide kab_kota field
-        if (userType === 'adminkabko') {
-            document.getElementById('kabkota_group').style.display = 'block';
-        } else {
-            document.getElementById('kabkota_group').style.display = 'none';
-        }
+        document.getElementById('input_nik').value = '';
 
         const labels = {
             'adminprov': '👑 Tambah Admin Provinsi',
             'adminkabko': '🏛️ Tambah Admin Kab/Ko',
-            'panitera': '⚖️ Tambah Panitera'
+            'panitera': '⚖️ Tambah Panitera',
+            'hafiz': '📖 Tambah Hafiz'
         };
         document.getElementById('modalTitle').innerText = labels[userType] || 'Tambah User';
+
+        // Visibility logic
+        document.getElementById('kabkota_group').style.display = (userType === 'adminkabko' || userType === 'hafiz') ? 'block' : 'none';
+        document.getElementById('nik_group').style.display = (userType === 'hafiz') ? 'block' : 'none';
 
         document.getElementById('userModal').style.display = 'flex';
     }
 
-    function editUser(id, userType, username, nama, password, kab_kota) {
+    function editUser(id, type, username, nama, password, kab_kota, nik = '') {
         document.getElementById('crud').value = 'edit';
         document.getElementById('crudid').value = id;
-        document.getElementById('user_type').value = userType;
+        document.getElementById('user_type').value = type;
         document.getElementById('input_username').value = username;
         document.getElementById('input_nama').value = nama;
         document.getElementById('input_password').value = password;
-        document.getElementById('input_kab_kota').value = kab_kota;
-
-        // Show/hide kab_kota field
-        if (userType === 'adminkabko') {
-            document.getElementById('kabkota_group').style.display = 'block';
-        } else {
-            document.getElementById('kabkota_group').style.display = 'none';
-        }
+        document.getElementById('input_kab_kota').value = kab_kota || '';
+        document.getElementById('input_nik').value = nik || '';
 
         const labels = {
             'adminprov': '✏️ Edit Admin Provinsi',
             'adminkabko': '✏️ Edit Admin Kab/Ko',
-            'panitera': '✏️ Edit Panitera'
+            'panitera': '✏️ Edit Panitera',
+            'hafiz': '✏️ Edit Hafiz'
         };
-        document.getElementById('modalTitle').innerText = labels[userType] || 'Edit User';
+        document.getElementById('modalTitle').innerText = labels[type] || 'Edit User';
+
+        // Visibility logic
+        document.getElementById('kabkota_group').style.display = (type === 'adminkabko' || type === 'hafiz') ? 'block' : 'none';
+        document.getElementById('nik_group').style.display = (type === 'hafiz') ? 'block' : 'none';
 
         document.getElementById('userModal').style.display = 'flex';
     }

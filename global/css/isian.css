@@ -74,7 +74,8 @@
 }
 
 /* Modal container */
-.modal {
+.modal,
+.popup {
     display: none;
     position: fixed;
     top: 0;
@@ -84,22 +85,21 @@
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
     z-index: 1000;
-    display: flex;
-    /* Changed to flex by default (but container is hidden) */
-    visibility: hidden;
-    /* Added visibility for better control with display none */
     justify-content: center;
     align-items: center;
     padding: 20px;
 }
 
-/* When modal is active (usually handled by JS changing display or adding a class) */
-.modal.active {
+/* When modal is shown via JS (display: flex) */
+.modal[style*="display: flex"],
+.modal[style*="display:flex"],
+.popup[style*="display: flex"],
+.popup[style*="display:flex"] {
     display: flex !important;
-    visibility: visible !important;
 }
 
-.modal .box {
+.modal .box,
+.popup .box {
     width: 100%;
     max-width: 600px;
     margin: auto;
@@ -111,6 +111,25 @@
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     overflow: hidden;
     animation: modalSlideUp 0.3s ease-out;
+}
+
+/* Text color fix for popup/modal content */
+.popup .box,
+.modal .box {
+    color: var(--text-primary, #f8fafc);
+}
+
+.popup .box .tombol,
+.popup .box .isi {
+    padding: 20px;
+}
+
+.popup .box .tombol {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-surface);
 }
 
 @keyframes modalSlideUp {

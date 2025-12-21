@@ -87,7 +87,7 @@ body {
 }
 
 .table tr:nth-child(even) {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: rgba(255, 255, 255, 0.02);
 }
 
 .table tr:hover {
