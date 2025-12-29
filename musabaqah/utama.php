@@ -1,4 +1,7 @@
 <?php
+// Load configuration
+include_once __DIR__ . '/../global/class/Config.php';
+
 function getmenu()
 {
 	global $role;
@@ -389,8 +392,8 @@ if ($iduser) {
 <div class="modern-app-container">
 
 	<div class="modern-header-main">
-		<h2>🕌 E-LPTQ</h2>
-		<div class="subtitle">Sistem Manajemen Musabaqah & Hafidz</div>
+		<h2><?php echo Config::get('app.logo_emoji', '🕌'); ?> <?php echo Config::get('app.name', 'E-LPTQ'); ?></h2>
+		<div class="subtitle"><?php echo Config::get('app.description', 'Sistem Manajemen Musabaqah & Hafidz'); ?></div>
 	</div>
 
 	<div class="menu">
@@ -414,7 +417,7 @@ if ($iduser) {
 			<?php
 			$iduser = getiduser();
 			if ($iduser) {
-				$rowvu = getonebaris("select * from view_user where iduser=$iduser");
+				$rowvu = getonebaris("select * from view_user where iduser=" . $iduser);
 				echo "👋 Selamat datang, <strong>$rowvu[nama]</strong>";
 			} else {
 				echo "👋 Selamat datang";
@@ -437,6 +440,6 @@ if ($iduser) {
 	</div>
 
 	<div class="modern-footer-main">
-		<p>© 2025 Musabaqah System · Dibuat dengan ❤️ untuk Jawa Timur</p>
+		<p>© <?php echo Config::get('copyright.year', '2025'); ?> <?php echo Config::get('copyright.footer_text', 'Musabaqah System · Dibuat dengan ❤️ untuk Jawa Timur'); ?></p>
 	</div>
 </div>

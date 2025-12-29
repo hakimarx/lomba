@@ -1,4 +1,7 @@
 <?php
+// Load Configuration
+include_once __DIR__ . "/global/class/Config.php";
+
 // Process login at the very top to prevent "headers already sent" error
 $login_error = "";
 if (!empty($_POST['username'])) {
@@ -20,21 +23,32 @@ if (!empty($_POST['username'])) {
         $login_error = "Login gagal! Username atau password salah.";
     }
 }
+
+// Get config values
+$appName = Config::get('app.name', 'E-LPTQ');
+$appDesc = Config::get('app.description', 'Sistem Manajemen Musabaqah & Hafidz');
+$metaDesc = Config::get('app.meta_desc', 'E-LPTQ: Sistem Manajemen Musabaqah & Hafidz');
+$logoEmoji = Config::get('app.logo_emoji', '🕌');
+$themeColor = Config::get('theme.primary', '#10b981');
+$copyrightYear = Config::get('copyright.year', '2025');
+$copyrightHolder = Config::get('copyright.holder', 'E-LPTQ');
+$hafizLoginLink = Config::get('links.hafiz_login', 'musabaqah/hafidz/login.php');
+$emaqraLink = Config::get('links.emaqra', 'emaqra/');
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="<?php echo Config::get('app.lang', 'id'); ?>">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#10b981">
-    <meta name="description" content="E-LPTQ: Sistem Manajemen Musabaqah & Hafidz Jawa Timur">
+    <meta name="theme-color" content="<?php echo $themeColor; ?>">
+    <meta name="description" content="<?php echo $metaDesc; ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="E-LPTQ">
-    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-title" content="<?php echo $appName; ?>">
+    <link rel="manifest" href="manifest.php">
     <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
-    <title>E-LPTQ - Sistem Manajemen Musabaqah & Hafidz</title>
+    <title><?php echo $appName; ?> - <?php echo $appDesc; ?></title>
     <style>
         * {
             margin: 0;
@@ -81,19 +95,9 @@ if (!empty($_POST['username'])) {
         }
 
         @keyframes float {
-
-            0%,
-            100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            33% {
-                transform: translate(30px, -30px) rotate(5deg);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) rotate(-5deg);
-            }
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(5deg); }
+            66% { transform: translate(-20px, 20px) rotate(-5deg); }
         }
 
         .container {
@@ -138,9 +142,7 @@ if (!empty($_POST['username'])) {
             font-size: 0.95em;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
 
         .form-label {
             display: block;
@@ -167,9 +169,7 @@ if (!empty($_POST['username'])) {
             box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
 
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.3); }
 
         .btn-login {
             width: 100%;
@@ -216,17 +216,14 @@ if (!empty($_POST['username'])) {
             font-size: 0.85em;
         }
 
-        .divider::before,
-        .divider::after {
+        .divider::before, .divider::after {
             content: '';
             flex: 1;
             height: 1px;
             background: rgba(255, 255, 255, 0.1);
         }
 
-        .divider span {
-            padding: 0 16px;
-        }
+        .divider span { padding: 0 16px; }
 
         .quick-links {
             display: flex;
@@ -251,17 +248,9 @@ if (!empty($_POST['username'])) {
         }
 
         @media (max-width: 480px) {
-            .login-card {
-                padding: 32px 24px;
-            }
-
-            .header h1 {
-                font-size: 2em;
-            }
-
-            .logo {
-                font-size: 3em;
-            }
+            .login-card { padding: 32px 24px; }
+            .header h1 { font-size: 2em; }
+            .logo { font-size: 3em; }
         }
     </style>
 </head>
@@ -270,13 +259,12 @@ if (!empty($_POST['username'])) {
     <div class="container">
         <div class="login-card">
             <div class="header">
-                <div class="logo">🕌</div>
-                <h1>E-LPTQ</h1>
-                <p>Sistem Manajemen Musabaqah & Hafidz</p>
+                <div class="logo"><?php echo $logoEmoji; ?></div>
+                <h1><?php echo $appName; ?></h1>
+                <p><?php echo $appDesc; ?></p>
             </div>
 
-            <?php
-            if ($login_error): ?>
+            <?php if ($login_error): ?>
                 <div class="error-message"><?php echo $login_error; ?></div>
             <?php endif; ?>
 
@@ -299,12 +287,12 @@ if (!empty($_POST['username'])) {
             </div>
 
             <div class="quick-links">
-                <a href="musabaqah/hafidz/login.php" class="quick-link">📚 Login Hafidz</a>
-                <a href="emaqra/" class="quick-link">📖 Emaqra Tools</a>
+                <a href="<?php echo $hafizLoginLink; ?>" class="quick-link">📚 Login Hafidz</a>
+                <a href="<?php echo $emaqraLink; ?>" class="quick-link">📖 Emaqra Tools</a>
             </div>
 
             <div class="footer">
-                <p>&copy; 2025 E-LPTQ. All rights reserved.</p>
+                <p>&copy; <?php echo $copyrightYear . ' ' . $copyrightHolder; ?>. All rights reserved.</p>
             </div>
         </div>
     </div>
